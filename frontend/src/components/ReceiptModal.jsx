@@ -1,0 +1,141 @@
+import React from 'react';
+import { Printer, X, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+export default function ReceiptModal({ bill, onClose }) {
+  const { restaurant } = useAuth();
+  if (!bill) return null;
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const currency = restaurant?.currency || '₹';
+  const order = bill.order || {};
+  const items = order.items || bill.items || [];
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]">
+        {/* Header Actions */}
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Tax Invoice / Receipt</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Printable Receipt Paper */}
+        <div className="p-6 overflow-y-auto flex-1 font-mono text-xs">
+          <div id="printable-receipt" className="bg-white text-black p-6 rounded-lg shadow-sm border border-slate-200">
+            {/* Store Header */}
+            <div className="text-center pb-4 border-b border-dashed border-gray-400">
+              <h2 className="text-lg font-bold uppercase tracking-wider">{restaurant?.name || 'APEX RESTAURANT'}</h2>
+              <p className="text-[11px] text-gray-600 mt-1">{restaurant?.address || 'City Center Mall, Food Court'}</p>
+              <p className="text-[11px] text-gray-600">Tel: {restaurant?.phone || '+91 98765 43210'}</p>
+              {restaurant?.gstNumber && (
+                <p className="text-[11px] font-semibold text-gray-700 mt-0.5">GSTIN: {restaurant.gstNumber}</p>
+              )}
+            </div>
+
+            {/* Bill Meta */}
+            <div className="py-3 border-b border-dashed border-gray-400 space-y-1 text-[11px]">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Bill No:</span>
+                <span className="font-bold">{bill.billNumber || `INV-${bill.id?.slice(0, 8)}`}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Table:</span>
+                <span className="font-bold">Table #{order.table?.tableNumber || bill.tableNumber || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Date:</span>
+                <span>{new Date(bill.createdAt || Date.now()).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Status:</span>
+                <span className="font-bold uppercase text-emerald-700">{bill.paymentStatus || 'PAID'}</span>
+              </div>
+            </div>
+
+            {/* Itemized Table */}
+            <div className="py-3 border-b border-dashed border-gray-400">
+              <div className="flex justify-between font-bold pb-2 text-[11px]">
+                <span className="w-1/2">Item</span>
+                <span className="w-1/6 text-center">Qty</span>
+                <span className="w-1/6 text-right">Price</span>
+                <span className="w-1/6 text-right">Total</span>
+              </div>
+              <div className="space-y-1.5 text-[11px]">
+                {items.map((it, idx) => {
+                  const name = it.menuItem?.name || it.name || 'Dish';
+                  const qty = it.quantity || 1;
+                  const price = it.unitPrice || it.price || 0;
+                  return (
+                    <div key={idx} className="flex justify-between">
+                      <span className="w-1/2 truncate">{name}</span>
+                      <span className="w-1/6 text-center">{qty}</span>
+                      <span className="w-1/6 text-right">{currency}{Number(price).toFixed(2)}</span>
+                      <span className="w-1/6 text-right font-medium">{currency}{(qty * price).toFixed(2)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Calculations */}
+            <div className="pt-3 space-y-1 text-[11px]">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Subtotal:</span>
+                <span>{currency}{Number(bill.subtotal || 0).toFixed(2)}</span>
+              </div>
+              {bill.discountAmount > 0 && (
+                <div className="flex justify-between text-rose-600">
+                  <span>Discount:</span>
+                  <span>-{currency}{Number(bill.discountAmount).toFixed(2)}</span>
+                </div>
+              )}
+              {bill.taxAmount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Tax / GST ({bill.taxRate || 5}%):</span>
+                  <span>{currency}{Number(bill.taxAmount).toFixed(2)}</span>
+                </div>
+              )}
+              {bill.serviceCharge > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Service Charge:</span>
+                  <span>{currency}{Number(bill.serviceCharge).toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-sm pt-2 border-t border-dashed border-gray-400 mt-2">
+                <span>Grand Total:</span>
+                <span>{currency}{Number(bill.totalAmount || bill.grandTotal || 0).toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center text-[10px] text-gray-500 mt-6 border-t border-dashed border-gray-400 pt-3">
+              <p className="font-semibold">Thank you for dining with us!</p>
+              <p>Have a wonderful day!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

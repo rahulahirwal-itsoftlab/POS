@@ -1,0 +1,32 @@
+import { isUuid } from './resource.validation.js';
+
+export const validateGenerateBill = (data) => {
+  const errors = [];
+  if (!isUuid(data?.orderId)) {
+    errors.push('orderId must be a UUID');
+  }
+  if (data?.discountAmount !== undefined && (isNaN(Number(data.discountAmount)) || Number(data.discountAmount) < 0)) {
+    errors.push('discountAmount cannot be negative');
+  }
+  return { isValid: errors.length === 0, errors };
+};
+
+export const validatePayment = (data) => {
+  const errors = [];
+  const validMethods = ['CASH', 'CARD', 'UPI', 'NET_BANKING', 'OTHER'];
+  if (!isUuid(data?.billId)) {
+    errors.push('billId must be a UUID');
+  }
+  if (data?.amount === undefined || isNaN(Number(data.amount)) || Number(data.amount) <= 0) {
+    errors.push('Payment amount must be greater than 0');
+  }
+  if (!data?.method || !validMethods.includes(data.method)) {
+    errors.push(`Payment method must be one of: ${validMethods.join(', ')}`);
+  }
+  return { isValid: errors.length === 0, errors };
+};
+
+export default {
+  validateGenerateBill,
+  validatePayment,
+};

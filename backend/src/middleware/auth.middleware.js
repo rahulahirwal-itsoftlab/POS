@@ -1,0 +1,87 @@
+import { verifyToken } from '../utils/jwt.js';
+import { sendError } from '../utils/response.js';
+import { prisma } from '../config/env.js';
+
+export const authenticate = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return sendError(res, 401, 'Authentication token missing or invalid', {
+        code: 'UNAUTHORIZED',
+        details: 'Authorization header must follow Bearer <token> format',
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+    let decoded;
+    try {
+      decoded = verifyToken(token);
+    } catch (jwtErr) {
+      if (jwtErr.name === 'TokenExpiredError') {
+        return sendError(res, 401, 'Authentication token has expired', { code: 'TOKEN_EXPIRED' });
+      }
+      return sendError(res, 401, 'Invalid authentication token', { code: 'INVALID_TOKEN' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId || decoded.id },
+      select: {
+        id: true,
+        restaurantId: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        restaurant: {
+          select: {
+            id: true,
+            name: true,
+            isActive: true,
+            currency: true,
+            taxRate: true,
+            subscription: {
+              include: {
+                plan: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return sendError(res, 401, 'User account no longer exists', { code: 'USER_NOT_FOUND' });
+    }
+
+    if (!user.isActive) {
+      return sendError(res, 401, 'User account has been deactivated', { code: 'ACCOUNT_DEACTIVATED' });
+    }
+
+    if (user.restaurant && user.role !== 'RESTAURANT_REGISTRATION_ADMIN') {
+      if (user.restaurant.isActive === false) {
+        return sendError(res, 403, 'Restaurant account has been deactivated. Please contact system administration.', {
+          code: 'RESTAURANT_DEACTIVATED',
+        });
+      }
+
+      if (user.restaurant.subscription && user.restaurant.subscription.status === 'SUSPENDED') {
+        return sendError(res, 403, 'Restaurant subscription has been suspended. Please contact platform administration.', {
+          code: 'SUBSCRIPTION_SUSPENDED',
+        });
+      }
+
+      if (user.restaurant.subscription && user.restaurant.subscription.status === 'EXPIRED') {
+        return sendError(res, 403, 'Restaurant subscription has expired. Please renew your plan.', {
+          code: 'SUBSCRIPTION_EXPIRED',
+        });
+      }
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default authenticate;

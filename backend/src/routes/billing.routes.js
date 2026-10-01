@@ -1,0 +1,33 @@
+import { Router } from 'express';
+import { validateQuery } from '../middleware/validation.middleware.js';
+import { validateUuidParams } from '../validations/resource.validation.js';
+import * as billingController from '../controllers/billing.controller.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import { authorizeRoles, ROLES } from '../middleware/role.middleware.js';
+import { validateRequest } from '../middleware/validation.middleware.js';
+import { validateGenerateBill } from '../validations/billing.validation.js';
+import { validateBillUpdate } from '../validations/resource.validation.js';
+
+const router = Router();
+validateUuidParams(router);
+
+router.use(authenticate);
+router.use(validateQuery);
+
+router.get('/pending-orders', billingController.getPendingOrders);
+router.get('/order/:orderId', billingController.getBillByOrderId);
+router.get('/bills', billingController.getBills);
+router.get('/bills/:id', billingController.getBillById);
+router.get('/', billingController.getBills);
+router.get('/:id', billingController.getBillById);
+router.post('/generate', authorizeRoles(ROLES.RECEPTIONIST, ROLES.RESTAURANT_OWNER), validateRequest(validateGenerateBill), billingController.createBill);
+router.post('/bills', authorizeRoles(ROLES.RECEPTIONIST, ROLES.RESTAURANT_OWNER), validateRequest(validateGenerateBill), billingController.createBill);
+router.post('/', authorizeRoles(ROLES.RECEPTIONIST, ROLES.RESTAURANT_OWNER), validateRequest(validateGenerateBill), billingController.createBill);
+router.patch('/bills/:id/deliver', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), billingController.deliverBill);
+router.post('/bills/:id/deliver', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), billingController.deliverBill);
+router.patch('/bills/:id', authorizeRoles(ROLES.RECEPTIONIST, ROLES.RESTAURANT_OWNER), validateRequest(validateBillUpdate), billingController.updateBill);
+router.patch('/:id/deliver', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), billingController.deliverBill);
+router.post('/:id/deliver', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), billingController.deliverBill);
+router.patch('/:id', authorizeRoles(ROLES.RECEPTIONIST, ROLES.RESTAURANT_OWNER), validateRequest(validateBillUpdate), billingController.updateBill);
+
+export default router;
