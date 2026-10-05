@@ -1386,7 +1386,98 @@ Guarded by `authorizeRoles('RESTAURANT_REGISTRATION_ADMIN')`. Platform Super Adm
 
 ---
 
-## 4. Endpoints NOT Implemented (Clarification)
+## 4. Module 00B: Authentication & Password Recovery (`/api/auth`)
+
+### 1. POST /api/auth/forgot-password
+- **Description:** Requests a 6-digit OTP code to reset password. Protected by account enumeration safeguards: always returns generic success if user does not exist or is deactivated. If user exists, generates cryptographically random 6-digit OTP, stores securely peppered SHA-256 hash with 10-minute expiry, and sends via SMTP.
+- **Authentication:** Public (No token required)
+- **Rate Limit:** 60-second cooldown between consecutive OTP requests.
+- **Request Body:**
+  ```json
+  {
+    "email": "user@example.com"
+  }
+  ```
+- **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "If the email is registered, a verification code has been sent.",
+    "data": {}
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: Email missing or invalid format.
+  - `429 Too Many Requests`: `Please wait X seconds before requesting a new verification code.`
+  - `503 Service Unavailable`: SMTP configuration missing or unconfigured.
+
+### 2. POST /api/auth/resend-reset-otp
+- **Description:** Resends a new single-use 6-digit OTP code to registered email, invalidating previous code. Enforces 60-second cooldown and account enumeration protection.
+- **Authentication:** Public (No token required)
+- **Request Body:**
+  ```json
+  {
+    "email": "user@example.com"
+  }
+  ```
+- **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "If the email is registered, a new verification code has been sent.",
+    "data": {}
+  }
+  ```
+- **Error Responses:**
+  - `429 Too Many Requests`: Cooldown active.
+
+### 3. POST /api/auth/verify-reset-otp
+- **Description:** Authoritatively verifies the 6-digit OTP. Checks attempt limits (maximum 5 failed attempts; invalidates OTP after 5), expiration (10 min), and matches hash. On success, permanently marks OTP as used and issues a short-lived 15-minute reset authorization token.
+- **Authentication:** Public (No token required)
+- **Request Body:**
+  ```json
+  {
+    "email": "user@example.com",
+    "otp": "483921"
+  }
+  ```
+- **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Verification code verified successfully",
+    "data": {
+      "resetToken": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    }
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: Code expired, invalid digits, or attempt limit exceeded.
+
+### 4. POST /api/auth/reset-password
+- **Description:** Resets user password using the short-lived reset authorization token. Validates password policy (min 8 chars, 1 uppercase, 1 lowercase, 1 digit), securely hashes password via bcrypt, updates user record, and invalidates all reset states.
+- **Authentication:** Public with verified `resetToken`
+- **Request Body:**
+  ```json
+  {
+    "resetToken": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "newPassword": "NewSecurePassword1"
+  }
+  ```
+- **Success Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "Password updated successfully",
+    "data": {}
+  }
+  ```
+- **Error Responses:**
+  - `400 Bad Request`: Invalid or expired reset session, or password does not satisfy complexity requirements.
+
+---
+
+## 5. Endpoints NOT Implemented (Clarification)
 
 The following endpoints were mentioned in preliminary designs or might be assumed by frontend developers, but are **NOT IMPLEMENTED** in this backend:
 
@@ -1400,4 +1491,4 @@ The following endpoints were mentioned in preliminary designs or might be assume
    *Actual Route:* Order items are updated via `PATCH /api/kitchen/items/:itemId/status` or pending orders are updated via `PATCH /api/orders/:id`.
 5. `POST /api/auth/refresh` — **NOT IMPLEMENTED**  
    *Actual Implementation:* JWT tokens are issued with a 24-hour expiration (`1d`) on login and registration; there is no refresh token endpoint.
-6. `POST /api/auth/forgot-password` — **NOT IMPLEMENTED**.
+

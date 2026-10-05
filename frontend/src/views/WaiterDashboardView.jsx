@@ -79,9 +79,9 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
 
   if (loading && !dashboardData) {
     return (
-      <div className="h-full flex items-center justify-center bg-slate-950 p-8">
-        <div className="flex flex-col items-center gap-3 text-slate-400">
-          <RefreshCw className="w-8 h-8 animate-spin text-emerald-400" />
+      <div className="h-full flex items-center justify-center bg-[#FAF7F2] p-8">
+        <div className="flex flex-col items-center gap-3 text-[#5B6470]">
+          <RefreshCw className="w-8 h-8 animate-spin text-[#92400E]" />
           <span className="font-medium text-sm">Loading live Waiter operations...</span>
         </div>
       </div>
@@ -98,24 +98,24 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
   } = dashboardData || {};
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 min-w-0">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5D8C6] shadow-sandstone">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400">
+            <div className="p-2.5 bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl text-[#92400E]">
               <LayoutDashboard className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-[#1F2937] flex items-center gap-2">
                 Floor Operations & Service Dispatch
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30">
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-[#92400E] font-medium border border-amber-200">
                   Waiter Live
                 </span>
               </h1>
-              <p className="text-xs text-slate-400">
-                Logged in as <span className="text-slate-200 font-semibold">{user?.name}</span> • Scoped to{' '}
-                <span className="text-slate-200 font-semibold">{restaurant?.name || 'Your Restaurant'}</span>
+              <p className="text-xs text-[#5B6470]">
+                Logged in as <span className="text-[#1F2937] font-semibold">{user?.name}</span> • Scoped to{' '}
+                <span className="text-[#1F2937] font-semibold">{restaurant?.name || 'Your Restaurant'}</span>
               </p>
             </div>
           </div>
@@ -125,16 +125,16 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
           <button
             onClick={() => fetchDashboard(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-medium border border-slate-700 transition"
+            className="flex items-center gap-2 px-3 py-2 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] rounded-xl text-xs font-semibold border border-[#E5D8C6] shadow-sandstone transition cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-emerald-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#92400E]' : 'text-[#5B6470]'}`} />
             Refresh
           </button>
           <button
             onClick={() => {
               if (setActiveTab) setActiveTab('tables');
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-950 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-[#92400E] hover:bg-[#78350F] text-white rounded-xl text-xs font-bold shadow-sandstone hover:shadow-sandstone-md transition cursor-pointer"
           >
             <LayoutGrid className="w-4 h-4" />
             Manage Tables
@@ -147,33 +147,33 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Ready Food Notifications */}
           {readyNotifications.length > 0 && (
-            <div className="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-4 shadow-lg">
+            <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 shadow-sandstone">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
                   <span className="flex h-2.5 w-2.5 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                   </span>
                   Ready to Serve from Kitchen ({readyNotifications.length})
                 </div>
-                <span className="text-xs text-amber-300/80 font-medium">Action Required</span>
+                <span className="text-xs text-amber-800 font-semibold">Action Required</span>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {readyNotifications.map((notif) => (
                   <div
                     key={notif.id}
-                    className="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-amber-500/20 text-xs"
+                    className="flex items-center justify-between bg-white p-3 rounded-xl border border-amber-200 shadow-sm text-xs"
                   >
                     <div>
-                      <div className="font-semibold text-white">
+                      <div className="font-bold text-[#1F2937]">
                         Table #{notif.tableNumber} • Order #{notif.orderNumber}
                       </div>
-                      <div className="text-slate-400 text-[11px]">{notif.itemsCount} dishes freshly prepared</div>
+                      <div className="text-[#5B6470] text-[11px]">{notif.itemsCount} dishes freshly prepared</div>
                     </div>
                     <button
                       onClick={() => handleServeOrder(notif.orderId, notif.tableNumber)}
                       disabled={actionLoading === `serve-${notif.orderId}`}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow transition flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-lg shadow-sandstone transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <Check className="w-3.5 h-3.5" />
                       Serve
@@ -186,34 +186,34 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
 
           {/* Ready Bill Notifications */}
           {billNotifications.length > 0 && (
-            <div className="bg-sky-950/40 border border-sky-500/40 rounded-2xl p-4 shadow-lg">
+            <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-4 shadow-sandstone">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-sky-400 font-bold text-sm">
+                <div className="flex items-center gap-2 text-blue-900 font-bold text-sm">
                   <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
                   </span>
                   Bills Ready to Deliver ({billNotifications.length})
                 </div>
-                <span className="text-xs text-sky-300/80 font-medium">Receptionist Generated</span>
+                <span className="text-xs text-blue-800 font-semibold">Receptionist Generated</span>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {billNotifications.map((notif) => (
                   <div
                     key={notif.id}
-                    className="flex items-center justify-between bg-slate-900/80 p-3 rounded-xl border border-sky-500/20 text-xs"
+                    className="flex items-center justify-between bg-white p-3 rounded-xl border border-blue-200 shadow-sm text-xs"
                   >
                     <div>
-                      <div className="font-semibold text-white">
+                      <div className="font-bold text-[#1F2937]">
                         Table #{notif.tableNumber} • {currency}
                         {notif.totalAmount.toFixed(2)}
                       </div>
-                      <div className="text-slate-400 text-[11px]">Bill #{notif.billNumber}</div>
+                      <div className="text-[#5B6470] text-[11px]">Bill #{notif.billNumber}</div>
                     </div>
                     <button
                       onClick={() => handleDeliverBill(notif.billId, notif.tableNumber)}
                       disabled={actionLoading === `deliver-${notif.billId}`}
-                      className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg shadow transition flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-lg shadow-sandstone transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <Receipt className="w-3.5 h-3.5" />
                       Deliver
@@ -229,120 +229,120 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
       {/* KPI Section - 3 Groups: Tables, Orders, Bills */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* A. TABLE OVERVIEW */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-            <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <LayoutGrid className="w-4 h-4 text-emerald-400" />
+        <div className="bg-white border border-[#E5D8C6] rounded-2xl p-5 shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 transition-all">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5D8C6]">
+            <h2 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <LayoutGrid className="w-4 h-4 text-[#92400E]" />
               Table Overview
             </h2>
-            <span className="text-xs text-slate-400">{tableOverview.totalTables || 0} Total</span>
+            <span className="text-xs text-[#5B6470] font-semibold">{tableOverview.totalTables || 0} Total</span>
           </div>
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Available</span>
-              <span className="text-lg font-bold text-emerald-400">{tableOverview.availableTables || 0}</span>
+            <div className="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Available</span>
+              <span className="text-xl font-bold text-emerald-800">{tableOverview.availableTables || 0}</span>
             </div>
-            <div className="p-3 bg-indigo-950/20 border border-indigo-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Occupied</span>
-              <span className="text-lg font-bold text-indigo-400">{tableOverview.occupiedTables || 0}</span>
+            <div className="p-3 bg-amber-50/60 border border-amber-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Occupied</span>
+              <span className="text-xl font-bold text-amber-900">{tableOverview.occupiedTables || 0}</span>
             </div>
-            <div className="p-3 bg-amber-950/20 border border-amber-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Needs Service</span>
-              <span className="text-lg font-bold text-amber-400">{tableOverview.tablesWaitingForService || 0}</span>
+            <div className="p-3 bg-rose-50/60 border border-rose-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Needs Service</span>
+              <span className="text-xl font-bold text-rose-800">{tableOverview.tablesWaitingForService || 0}</span>
             </div>
-            <div className="p-3 bg-sky-950/20 border border-sky-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Waiting Bill</span>
-              <span className="text-lg font-bold text-sky-400">{tableOverview.tablesWaitingForBilling || 0}</span>
+            <div className="p-3 bg-blue-50/60 border border-blue-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Waiting Bill</span>
+              <span className="text-xl font-bold text-blue-800">{tableOverview.tablesWaitingForBilling || 0}</span>
             </div>
           </div>
         </div>
 
         {/* B. ORDER OVERVIEW */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-            <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <ClipboardList className="w-4 h-4 text-amber-400" />
+        <div className="bg-white border border-[#E5D8C6] rounded-2xl p-5 shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 transition-all">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5D8C6]">
+            <h2 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <ClipboardList className="w-4 h-4 text-[#92400E]" />
               Kitchen & Order Flow
             </h2>
-            <span className="text-xs text-slate-400">Live Status</span>
+            <span className="text-xs text-[#5B6470] font-semibold">Live Status</span>
           </div>
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="p-3 bg-blue-950/20 border border-blue-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">New Queue</span>
-              <span className="text-lg font-bold text-blue-400">{orderOverview.newOrders || 0}</span>
+            <div className="p-3 bg-blue-50/60 border border-blue-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">New Queue</span>
+              <span className="text-xl font-bold text-blue-800">{orderOverview.newOrders || 0}</span>
             </div>
-            <div className="p-3 bg-amber-950/20 border border-amber-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Cooking Now</span>
-              <span className="text-lg font-bold text-amber-400">{orderOverview.preparingOrders || 0}</span>
+            <div className="p-3 bg-amber-50/60 border border-amber-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Cooking Now</span>
+              <span className="text-xl font-bold text-amber-900">{orderOverview.preparingOrders || 0}</span>
             </div>
-            <div className="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Ready Food</span>
-              <span className="text-lg font-bold text-emerald-400">{orderOverview.readyOrders || 0}</span>
+            <div className="p-3 bg-emerald-50/60 border border-emerald-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Ready Food</span>
+              <span className="text-xl font-bold text-emerald-800">{orderOverview.readyOrders || 0}</span>
             </div>
-            <div className="p-3 bg-purple-950/20 border border-purple-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Served Today</span>
-              <span className="text-lg font-bold text-purple-400">{orderOverview.servedOrders || 0}</span>
+            <div className="p-3 bg-blue-50/60 border border-blue-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Served Today</span>
+              <span className="text-xl font-bold text-blue-800">{orderOverview.servedOrders || 0}</span>
             </div>
           </div>
         </div>
 
         {/* C. BILL OVERVIEW */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-            <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <Receipt className="w-4 h-4 text-sky-400" />
+        <div className="bg-white border border-[#E5D8C6] rounded-2xl p-5 shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 transition-all">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E5D8C6]">
+            <h2 className="text-sm font-bold text-[#1F2937] flex items-center gap-2">
+              <Receipt className="w-4 h-4 text-[#92400E]" />
               Guest Billing Dispatch
             </h2>
-            <span className="text-xs text-slate-400">Operational</span>
+            <span className="text-xs text-[#5B6470] font-semibold">Operational</span>
           </div>
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="p-3 bg-rose-950/20 border border-rose-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Unpaid Bills</span>
-              <span className="text-lg font-bold text-rose-400">{billOverview.pendingBills || 0}</span>
+            <div className="p-3 bg-rose-50/60 border border-rose-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Unpaid Bills</span>
+              <span className="text-xl font-bold text-rose-800">{billOverview.pendingBills || 0}</span>
             </div>
-            <div className="p-3 bg-sky-950/20 border border-sky-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Ready to Deliver</span>
-              <span className="text-lg font-bold text-sky-400">{billOverview.readyToDeliverBills || 0}</span>
+            <div className="p-3 bg-blue-50/60 border border-blue-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Ready to Deliver</span>
+              <span className="text-xl font-bold text-blue-800">{billOverview.readyToDeliverBills || 0}</span>
             </div>
-            <div className="p-3 bg-teal-950/20 border border-teal-500/20 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Delivered Bills</span>
-              <span className="text-lg font-bold text-teal-400">{billOverview.deliveredBills || 0}</span>
+            <div className="p-3 bg-teal-50/60 border border-teal-200/80 rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Delivered Bills</span>
+              <span className="text-xl font-bold text-teal-800">{billOverview.deliveredBills || 0}</span>
             </div>
-            <div className="p-3 bg-slate-800/40 border border-slate-700/40 rounded-xl">
-              <span className="text-slate-400 text-[11px] block">Completed Paid</span>
-              <span className="text-lg font-bold text-slate-200">{billOverview.completedBills || 0}</span>
+            <div className="p-3 bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl">
+              <span className="text-[#5B6470] text-[11px] block font-medium">Completed Paid</span>
+              <span className="text-xl font-bold text-[#1F2937]">{billOverview.completedBills || 0}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* D. TABLE-WISE ORDER STATUS GRID */}
-      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <div className="bg-white border border-[#E5D8C6] rounded-2xl p-6 shadow-sandstone space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-base font-bold text-[#1F2937] flex items-center gap-2">
+              <LayoutGrid className="w-5 h-5 text-[#92400E]" />
               Table-wise Service Matrix
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#5B6470]">
               Real-time table occupancy, active orders, and one-click staff actions
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Available
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Available
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <span className="w-2 h-2 rounded-full bg-amber-400"></span> Cooking
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span> Cooking
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span> Ready
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> Ready
             </span>
           </div>
         </div>
 
         {tableOrders.length === 0 ? (
-          <div className="text-center py-12 text-slate-500 text-sm">
+          <div className="text-center py-12 text-[#9CA3AF] text-sm">
             No tables configured in this restaurant.
           </div>
         ) : (
@@ -358,38 +358,38 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
               return (
                 <div
                   key={t.tableId}
-                  className={`flex flex-col justify-between p-4 rounded-xl border transition shadow-md ${
+                  className={`flex flex-col justify-between p-4 rounded-xl border transition shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 ${
                     isReady
-                      ? 'bg-amber-950/30 border-amber-500/60 shadow-amber-950/30'
+                      ? 'bg-rose-50/40 border-rose-300'
                       : isCooking
-                      ? 'bg-slate-900/90 border-blue-500/30'
+                      ? 'bg-amber-50/40 border-amber-300'
                       : isServed
-                      ? 'bg-purple-950/20 border-purple-500/30'
+                      ? 'bg-blue-50/30 border-blue-200'
                       : isAvailable
-                      ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
-                      : 'bg-slate-900/60 border-slate-800'
+                      ? 'bg-white border-[#E5D8C6] hover:border-[#92400E]'
+                      : 'bg-white border-[#E5D8C6]'
                   }`}
                 >
                   {/* Top Bar */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-base font-bold text-white flex items-center gap-1.5">
+                      <span className="text-base font-bold text-[#1F2937] flex items-center gap-1.5">
                         Table #{t.tableNumber}
-                        <span className="text-[11px] text-slate-400 font-normal">({t.capacity} seats)</span>
+                        <span className="text-[11px] text-[#5B6470] font-normal">({t.capacity} seats)</span>
                       </span>
 
                       {/* Status Badge */}
                       <span
-                        className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                        className={`text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full border ${
                           isReady
-                            ? 'bg-amber-500 text-slate-950 animate-pulse'
+                            ? 'bg-rose-100 text-rose-800 border-rose-200 animate-pulse'
                             : isCooking
-                            ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            ? 'bg-amber-100 text-amber-900 border-amber-200'
                             : isPending
-                            ? 'bg-slate-700 text-slate-300'
+                            ? 'bg-slate-100 text-slate-700 border-slate-200'
                             : isServed
-                            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            ? 'bg-blue-100 text-blue-800 border-blue-200'
+                            : 'bg-emerald-100 text-emerald-800 border-emerald-200'
                         }`}
                       >
                         {t.operationalStatus}
@@ -398,20 +398,20 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
 
                     {/* Order Details Body */}
                     {order ? (
-                      <div className="space-y-1.5 my-3 text-xs bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80">
-                        <div className="flex justify-between items-center text-slate-300">
-                          <span className="font-semibold text-white">#{order.orderNumber}</span>
-                          <span className="text-[11px] text-slate-400">{order.itemsCount} Items</span>
+                      <div className="space-y-1.5 my-3 text-xs bg-[#FAF7F2] p-2.5 rounded-lg border border-[#E5D8C6]">
+                        <div className="flex justify-between items-center text-[#1F2937]">
+                          <span className="font-bold text-[#1F2937]">#{order.orderNumber}</span>
+                          <span className="text-[11px] text-[#5B6470] font-medium">{order.itemsCount} Items</span>
                         </div>
                         {order.itemsSummary && (
-                          <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                          <p className="text-[11px] text-[#5B6470] line-clamp-2 leading-relaxed">
                             {order.itemsSummary}
                           </p>
                         )}
                         {order.bill && (
-                          <div className="pt-1.5 border-t border-slate-800 flex justify-between text-[11px]">
-                            <span className="text-slate-400">Bill: #{order.bill.billNumber}</span>
-                            <span className="font-bold text-emerald-400">
+                          <div className="pt-1.5 border-t border-[#E5D8C6] flex justify-between text-[11px]">
+                            <span className="text-[#5B6470]">Bill: #{order.bill.billNumber}</span>
+                            <span className="font-bold text-[#92400E]">
                               {currency}
                               {order.bill.totalAmount.toFixed(2)}
                             </span>
@@ -419,19 +419,19 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
                         )}
                       </div>
                     ) : (
-                      <div className="my-6 text-center text-slate-500 text-xs italic">
+                      <div className="my-6 text-center text-[#9CA3AF] text-xs italic">
                         Table available for new guests
                       </div>
                     )}
                   </div>
 
                   {/* Operational Action Buttons */}
-                  <div className="pt-2 border-t border-slate-800/60 mt-2">
+                  <div className="pt-2 border-t border-[#E5D8C6] mt-2">
                     {isReady ? (
                       <button
                         onClick={() => handleServeOrder(order.id, t.tableNumber)}
                         disabled={actionLoading === `serve-${order.id}`}
-                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs shadow flex items-center justify-center gap-1.5 transition"
+                        className="w-full py-2 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-lg text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                       >
                         <Check className="w-4 h-4" />
                         SERVE FOOD
@@ -440,7 +440,7 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
                       <button
                         onClick={() => handleDeliverBill(order.bill.id, t.tableNumber)}
                         disabled={actionLoading === `deliver-${order.bill.id}`}
-                        className="w-full py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-lg text-xs shadow flex items-center justify-center gap-1.5 transition"
+                        className="w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-lg text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                       >
                         <Receipt className="w-4 h-4" />
                         DELIVER BILL
@@ -454,7 +454,7 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
                             setActiveTab('tables');
                           }
                         }}
-                        className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 font-semibold rounded-lg text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition"
+                        className="w-full py-2 bg-[#92400E] hover:bg-[#78350F] text-white font-bold rounded-lg text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                       >
                         <PlusCircle className="w-4 h-4" />
                         NEW ORDER
@@ -468,7 +468,7 @@ export default function WaiterDashboardView({ setActiveTab, onSelectTableForOrde
                             setActiveTab('tables');
                           }
                         }}
-                        className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition"
+                        className="w-full py-2 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] font-semibold rounded-lg text-xs border border-[#E5D8C6] shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                       >
                         <PlusCircle className="w-4 h-4" />
                         ADD ITEMS / VIEW

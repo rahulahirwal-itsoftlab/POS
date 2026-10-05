@@ -49,6 +49,46 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.forgotPassword(email);
+    return sendSuccess(res, 200, result.message, {});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resendResetOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.resendResetOtp(email);
+    return sendSuccess(res, 200, result.message, {});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyResetOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    const result = await authService.verifyResetOtp({ email, otp });
+    return sendSuccess(res, 200, result.message, { resetToken: result.resetToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { resetToken, newPassword } = req.body;
+    const result = await authService.resetPassword({ resetToken, newPassword });
+    return sendSuccess(res, 200, result.message, {});
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   registerOwner,
   login,
@@ -56,4 +96,9 @@ export default {
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resendResetOtp,
+  verifyResetOtp,
+  resetPassword,
 };
+

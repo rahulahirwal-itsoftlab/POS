@@ -8,6 +8,12 @@ export const env = {
   DATABASE_URL: process.env.DATABASE_URL || '',
   JWT_SECRET: process.env.JWT_SECRET || '',
   NODE_ENV: process.env.NODE_ENV || 'development',
+  SMTP_HOST: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || '587', 10),
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASSWORD: process.env.SMTP_PASSWORD || '',
+  SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL || '',
+  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || 'ApexPOS',
 };
 
 // Singleton PrismaClient setup

@@ -1,5 +1,6 @@
 import { prisma } from '../config/env.js';
 import { findManyPaginated } from '../utils/pagination.js';
+import { serializableTransaction } from '../utils/transaction.js';
 
 export const createInventoryItem = async (restaurantId, data) => {
   const name = data.name.trim();
@@ -17,23 +18,85 @@ export const createInventoryItem = async (restaurantId, data) => {
     throw error;
   }
 
-  return await prisma.inventoryItem.create({
-    data: {
-      restaurantId,
-      name,
-      sku: data.sku || null,
-      currentStock: data.currentStock !== undefined ? Number(data.currentStock) : 0,
-      minStockThreshold: data.minStockThreshold !== undefined ? Number(data.minStockThreshold) : 5,
-      unit: data.unit,
-      costPerUnit: data.costPerUnit !== undefined ? Number(data.costPerUnit) : 0,
-    },
+  const rawStock = data.currentStock !== undefined ? data.currentStock : data.openingStock;
+  const rawMin = data.minStockThreshold !== undefined
+    ? data.minStockThreshold
+    : (data.minSafeLevel !== undefined ? data.minSafeLevel : data.minStockLevel);
+  const rawCost = data.costPerUnit !== undefined
+    ? data.costPerUnit
+    : (data.costPrice !== undefined ? data.costPrice : data.cost);
+
+  const initialStock = rawStock !== undefined && rawStock !== null && rawStock !== '' ? Number(rawStock) : 0;
+  const minThreshold = rawMin !== undefined && rawMin !== null && rawMin !== '' ? Number(rawMin) : 5;
+  const cost = rawCost !== undefined && rawCost !== null && rawCost !== '' ? Number(rawCost) : 0;
+
+  return await serializableTransaction(prisma, async (tx) => {
+    const item = await tx.inventoryItem.create({
+      data: {
+        restaurantId,
+        name,
+        sku: data.sku ? String(data.sku).trim() : null,
+        currentStock: initialStock,
+        minStockThreshold: minThreshold,
+        unit: data.unit,
+        costPerUnit: cost,
+      },
+    });
+
+    if (initialStock > 0) {
+      await tx.inventoryTransaction.create({
+        data: {
+          restaurantId,
+          inventoryItemId: item.id,
+          type: 'PURCHASE',
+          quantity: initialStock,
+          unit: item.unit,
+          previousBalance: 0,
+          remainingBalance: initialStock,
+          reason: 'Initial Opening Stock',
+          reference: 'Opening Inventory Balance',
+        },
+      });
+    }
+
+    return item;
   });
+};
+
+export const getInventoryTransactions = async (restaurantId, filters = {}) => {
+  const where = { restaurantId };
+  if (filters.type && filters.type !== 'ALL') {
+    where.type = filters.type;
+  }
+  if (filters.inventoryItemId) {
+    where.inventoryItemId = filters.inventoryItemId;
+  }
+  if (filters.search) {
+    where.OR = [
+      { reason: { contains: String(filters.search), mode: 'insensitive' } },
+      { reference: { contains: String(filters.search), mode: 'insensitive' } },
+      { inventoryItem: { name: { contains: String(filters.search), mode: 'insensitive' } } },
+      { inventoryItem: { sku: { contains: String(filters.search), mode: 'insensitive' } } },
+    ];
+  }
+  return await findManyPaginated(prisma.inventoryTransaction, {
+    where,
+    include: {
+      inventoryItem: { select: { id: true, name: true, sku: true, unit: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  }, filters);
 };
 
 export const getInventoryItems = async (restaurantId, filters = {}) => {
   const where = { restaurantId };
   if (filters.unit) where.unit = filters.unit;
-  if (filters.search) where.name = { contains: String(filters.search), mode: 'insensitive' };
+  if (filters.search) {
+    where.OR = [
+      { name: { contains: String(filters.search), mode: 'insensitive' } },
+      { sku: { contains: String(filters.search), mode: 'insensitive' } },
+    ];
+  }
   return await findManyPaginated(prisma.inventoryItem, {
     where,
     orderBy: { name: 'asc' },
@@ -66,15 +129,23 @@ export const getInventoryItemById = async (restaurantId, id) => {
 export const updateInventoryItem = async (restaurantId, id, data) => {
   await getInventoryItemById(restaurantId, id);
 
+  const rawStock = data.currentStock !== undefined ? data.currentStock : data.openingStock;
+  const rawMin = data.minStockThreshold !== undefined
+    ? data.minStockThreshold
+    : (data.minSafeLevel !== undefined ? data.minSafeLevel : data.minStockLevel);
+  const rawCost = data.costPerUnit !== undefined
+    ? data.costPerUnit
+    : (data.costPrice !== undefined ? data.costPrice : data.cost);
+
   return await prisma.inventoryItem.update({
     where: { id },
     data: {
       name: data.name ? data.name.trim() : undefined,
-      sku: data.sku !== undefined ? data.sku : undefined,
-      currentStock: data.currentStock !== undefined ? Number(data.currentStock) : undefined,
-      minStockThreshold: data.minStockThreshold !== undefined ? Number(data.minStockThreshold) : undefined,
+      sku: data.sku !== undefined ? (data.sku ? String(data.sku).trim() : null) : undefined,
+      currentStock: rawStock !== undefined ? Number(rawStock) : undefined,
+      minStockThreshold: rawMin !== undefined ? Number(rawMin) : undefined,
       unit: data.unit || undefined,
-      costPerUnit: data.costPerUnit !== undefined ? Number(data.costPerUnit) : undefined,
+      costPerUnit: rawCost !== undefined ? Number(rawCost) : undefined,
     },
   });
 };
@@ -138,12 +209,103 @@ export const deleteInventoryItem = async (restaurantId, id) => {
   });
 };
 
+export const adjustStock = async (restaurantId, id, data, user = {}) => {
+  const rawAdjustment = data.quantityAdjustment !== undefined
+    ? data.quantityAdjustment
+    : (data.quantity !== undefined ? data.quantity : data.adjustment);
+
+  const adjustment = Number(rawAdjustment);
+  if (!Number.isFinite(adjustment)) {
+    const error = new Error('quantityAdjustment must be a valid number');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (adjustment === 0) {
+    const error = new Error('quantityAdjustment cannot be zero');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const reason = data.reason ? String(data.reason).trim() : 'Manual Stock Adjustment';
+  const auditNotes = data.auditNotes !== undefined ? data.auditNotes : (data.notes !== undefined ? data.notes : null);
+
+  return await serializableTransaction(prisma, async (tx) => {
+    const item = await tx.inventoryItem.findFirst({
+      where: { id, restaurantId },
+      include: {
+        recipeIngredients: { include: { recipe: { include: { menuItem: true } } } },
+      },
+    });
+
+    if (!item) {
+      const error = new Error('Inventory item not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const currentStockNum = Number(item.currentStock);
+    const newStockNum = Number((currentStockNum + adjustment).toFixed(4));
+
+    if (newStockNum < 0) {
+      const error = new Error('Insufficient stock. Stock cannot become negative.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const updateWhere = {
+      id,
+      restaurantId,
+      ...(adjustment < 0 ? { currentStock: { gte: Math.abs(adjustment) } } : {}),
+    };
+
+    const updateResult = await tx.inventoryItem.updateMany({
+      where: updateWhere,
+      data: { currentStock: newStockNum },
+    });
+
+    if (!updateResult.count) {
+      const error = new Error('Insufficient stock. Stock cannot become negative.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const reference = auditNotes && String(auditNotes).trim()
+      ? String(auditNotes).trim()
+      : (user?.name ? `Adjusted by ${user.name}` : null);
+
+    await tx.inventoryTransaction.create({
+      data: {
+        restaurantId,
+        inventoryItemId: id,
+        type: 'ADJUSTMENT',
+        quantity: adjustment,
+        unit: item.unit,
+        previousBalance: currentStockNum,
+        remainingBalance: newStockNum,
+        reason,
+        reference,
+      },
+    });
+
+    return await tx.inventoryItem.findFirst({
+      where: { id, restaurantId },
+      include: {
+        recipeIngredients: { include: { recipe: { include: { menuItem: true } } } },
+      },
+    });
+  });
+};
+
 export default {
   createInventoryItem,
   getInventoryItems,
+  getInventoryTransactions,
   getLowStockItems,
   getInventoryItemById,
   updateInventoryItem,
   updateStock,
+  adjustStock,
   deleteInventoryItem,
 };
+

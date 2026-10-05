@@ -1,9 +1,10 @@
 import app from './app.js';
 import { env } from './config/env.js';
+import { verifySmtpConnection } from './services/email.service.js';
 
 const PORT = env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`==================================================`);
   console.log(` Restaurant POS Backend Server Started`);
   console.log(` Environment : ${env.NODE_ENV}`);
@@ -11,6 +12,9 @@ const server = app.listen(PORT, () => {
   console.log(` Health URL  : http://localhost:${PORT}/api/health`);
   console.log(` API Base    : http://localhost:${PORT}/api`);
   console.log(`==================================================`);
+
+  // Verify SMTP connection in development/startup without exposing credentials
+  await verifySmtpConnection();
 });
 
 server.on('error', (error) => {

@@ -85,7 +85,7 @@ export const getKitchenDashboard = async (restaurantId) => {
       orderBy: { createdAt: 'asc' },
     }),
     prisma.inventoryTransaction.findMany({
-      where: { restaurantId },
+      where: { restaurantId, type: 'CONSUMPTION' },
       include: {
         inventoryItem: { select: { name: true, unit: true } },
       },

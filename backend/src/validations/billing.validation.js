@@ -17,10 +17,12 @@ export const validatePayment = (data) => {
   if (!isUuid(data?.billId)) {
     errors.push('billId must be a UUID');
   }
-  if (data?.amount === undefined || isNaN(Number(data.amount)) || Number(data.amount) <= 0) {
+  const rawAmount = data?.amount !== undefined ? data.amount : data?.amountPaid;
+  if (rawAmount === undefined || isNaN(Number(rawAmount)) || Number(rawAmount) <= 0) {
     errors.push('Payment amount must be greater than 0');
   }
-  if (!data?.method || !validMethods.includes(data.method)) {
+  const rawMethod = data?.method !== undefined ? data.method : data?.paymentMethod;
+  if (!rawMethod || !validMethods.includes(rawMethod)) {
     errors.push(`Payment method must be one of: ${validMethods.join(', ')}`);
   }
   return { isValid: errors.length === 0, errors };

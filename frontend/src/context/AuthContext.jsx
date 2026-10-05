@@ -108,6 +108,14 @@ export const AuthProvider = ({ children }) => {
     setRestaurant(null);
   };
 
+  const updateUserData = (updatedFields) => {
+    setUser((prev) => {
+      const next = typeof updatedFields === 'function' ? updatedFields(prev) : { ...prev, ...updatedFields };
+      setActiveUser(next);
+      return next;
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -123,6 +131,8 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         setRestaurant,
+        setUser: updateUserData,
+        updateUser: updateUserData,
       }}
     >
       {children}

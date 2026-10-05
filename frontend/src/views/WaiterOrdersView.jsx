@@ -106,19 +106,19 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 min-w-0">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5D8C6] shadow-sandstone">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400">
+            <div className="p-2.5 bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl text-[#92400E]">
               <ClipboardList className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-[#1F2937] flex items-center gap-2">
                 Waiter Orders & Tickets
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#5B6470]">
                 Track active orders, kitchen preparation status, and customer service delivery
               </p>
             </div>
@@ -128,25 +128,25 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
         {/* Filters and Search */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#5B6470] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search table or order #..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+              className="bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#1F2937] placeholder-[#5B6470] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto">
+          <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-[#E5D8C6] text-xs overflow-x-auto">
             {['ALL', 'READY', 'IN_PREPARATION', 'ACCEPTED', 'PENDING', 'SERVED', 'COMPLETED'].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1 rounded-lg font-medium transition whitespace-nowrap ${
+                className={`px-3 py-1 rounded-lg font-semibold transition whitespace-nowrap cursor-pointer ${
                   statusFilter === st
-                    ? 'bg-amber-600 text-white shadow'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#92400E] text-white shadow-sandstone'
+                    : 'text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB]'
                 }`}
               >
                 {st.replace('_', ' ')}
@@ -157,20 +157,20 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E5D8C6] rounded-2xl overflow-hidden shadow-sandstone">
         {loading ? (
-          <div className="py-20 flex justify-center items-center text-slate-400 text-sm">
-            <RefreshCw className="w-6 h-6 animate-spin text-amber-400 mr-2" />
+          <div className="py-20 flex justify-center items-center text-[#5B6470] text-sm">
+            <RefreshCw className="w-6 h-6 animate-spin text-[#92400E] mr-2" />
             Loading kitchen tickets...
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-16 text-slate-500 text-sm">
+          <div className="text-center py-16 text-[#9CA3AF] text-sm">
             No orders found matching the selected filter.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+              <thead className="bg-[#FAF7F2] text-[#5B6470] uppercase tracking-wider text-[11px] border-b border-[#E5D8C6]">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Order #</th>
                   <th className="py-3.5 px-4 font-semibold">Table</th>
@@ -181,7 +181,7 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
                   <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-[#E5D8C6] text-[#1F2937]">
                 {filteredOrders.map((o) => {
                   const isReady = o.status === 'READY';
                   const isCooking = ['ACCEPTED', 'IN_PREPARATION'].includes(o.status);
@@ -195,71 +195,71 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
                   return (
                     <tr
                       key={o.id}
-                      className={`hover:bg-slate-800/40 transition ${
-                        isReady ? 'bg-amber-950/20' : ''
+                      className={`hover:bg-[#F1E8DB]/40 transition ${
+                        isReady ? 'bg-rose-50/40' : ''
                       }`}
                     >
-                      <td className="py-3 px-4 font-mono font-bold text-white">
+                      <td className="py-3.5 px-4 font-mono font-bold text-[#1F2937]">
                         #{o.orderNumber}
                       </td>
-                      <td className="py-3 px-4">
-                        <span className="font-semibold text-white">
+                      <td className="py-3.5 px-4">
+                        <span className="font-semibold text-[#1F2937]">
                           {o.table ? `Table #${o.table.tableNumber}` : 'Takeaway'}
                         </span>
                       </td>
-                      <td className="py-3 px-4 max-w-xs">
-                        <span className="font-medium text-slate-200 block truncate" title={dishesSummary}>
+                      <td className="py-3.5 px-4 max-w-xs">
+                        <span className="font-medium text-[#1F2937] block truncate" title={dishesSummary}>
                           {dishesSummary || 'No items'}
                         </span>
-                        <span className="text-[11px] text-slate-400">{totalItems} Total items</span>
+                        <span className="text-[11px] text-[#5B6470]">{totalItems} Total items</span>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                             isReady
-                              ? 'bg-amber-500 text-slate-950 font-extrabold animate-pulse'
+                              ? 'bg-rose-100 text-rose-800 border-rose-200 font-extrabold animate-pulse'
                               : isCooking
-                              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                              ? 'bg-amber-100 text-amber-900 border-amber-200'
                               : isPending
-                              ? 'bg-slate-700 text-slate-300'
+                              ? 'bg-slate-100 text-slate-700 border-slate-200'
                               : isServed
-                              ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                              ? 'bg-blue-100 text-blue-800 border-blue-200'
                               : isCompleted
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                              : 'bg-rose-100 text-rose-800 border-rose-200'
                           }`}
                         >
                           {o.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         {o.bill ? (
                           <span
-                            className={`font-semibold ${
+                            className={`font-bold ${
                               o.bill.status === 'PAID'
-                                ? 'text-emerald-400'
+                                ? 'text-emerald-800'
                                 : o.bill.isDelivered
-                                ? 'text-sky-400'
-                                : 'text-amber-400'
+                                ? 'text-blue-800'
+                                : 'text-[#92400E]'
                             }`}
                           >
                             {o.bill.status} ({currency}
                             {Number(o.bill.totalAmount).toFixed(2)})
                           </span>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">Unbilled</span>
+                          <span className="text-[#9CA3AF] text-[11px]">Unbilled</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-slate-400 text-[11px] whitespace-nowrap">
+                      <td className="py-3.5 px-4 text-[#5B6470] text-[11px] whitespace-nowrap">
                         {new Date(o.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           {isReady && (
                             <button
                               onClick={() => handleServe(o.id, o.table?.tableNumber || 'Takeaway')}
                               disabled={actionLoading === `serve-${o.id}`}
-                              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs shadow flex items-center gap-1"
+                              className="px-3 py-1.5 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-lg text-xs shadow-sandstone flex items-center gap-1 cursor-pointer"
                             >
                               <Check className="w-3.5 h-3.5" />
                               Serve
@@ -273,7 +273,7 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
                                   onSelectTableForOrder(o.table);
                                 }
                               }}
-                              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs border border-slate-700 transition"
+                              className="px-2.5 py-1.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] rounded-lg text-xs border border-[#E5D8C6] shadow-sandstone transition cursor-pointer"
                               title="Add more dishes"
                             >
                               <PlusCircle className="w-3.5 h-3.5" />
@@ -282,7 +282,7 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
 
                           <button
                             onClick={() => setSelectedOrder(o)}
-                            className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition"
+                            className="p-1.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#5B6470] hover:text-[#1F2937] rounded-lg border border-[#E5D8C6] shadow-sandstone transition cursor-pointer"
                             title="View details"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -300,23 +300,23 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white border border-[#E5D8C6] rounded-2xl w-full max-w-lg p-6 shadow-sandstone-lg space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5D8C6]">
               <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#1F2937] flex items-center gap-2">
                   Order #{selectedOrder.orderNumber}
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#1F2937] border border-[#E5D8C6] font-medium">
                     {selectedOrder.table ? `Table #${selectedOrder.table.tableNumber}` : 'Takeaway'}
                   </span>
                 </h3>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-[#5B6470]">
                   Created at {new Date(selectedOrder.createdAt).toLocaleTimeString()}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+                className="p-1.5 text-[#5B6470] hover:text-[#1F2937] rounded-lg hover:bg-[#F1E8DB] transition cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -327,15 +327,15 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
               {selectedOrder.items?.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs"
+                  className="flex items-center justify-between p-2.5 bg-[#FAF7F2] rounded-xl border border-[#E5D8C6] text-xs"
                 >
                   <div>
-                    <span className="font-semibold text-white">
+                    <span className="font-bold text-[#1F2937]">
                       {item.quantity}x {item.menuItem?.name}
                     </span>
-                    {item.notes && <p className="text-[11px] text-amber-400 mt-0.5">Note: {item.notes}</p>}
+                    {item.notes && <p className="text-[11px] text-amber-800 mt-0.5 font-medium">Note: {item.notes}</p>}
                   </div>
-                  <span className="font-mono text-slate-300 font-bold">
+                  <span className="font-mono text-[#92400E] font-bold">
                     {currency}
                     {Number(item.subtotal || 0).toFixed(2)}
                   </span>
@@ -344,31 +344,31 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
             </div>
 
             {/* Summary details */}
-            <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-800 space-y-1.5 text-xs">
+            <div className="bg-[#FAF7F2] p-3 rounded-xl border border-[#E5D8C6] space-y-1.5 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Order Status:</span>
-                <span className="font-bold text-white uppercase">{selectedOrder.status}</span>
+                <span className="text-[#5B6470]">Order Status:</span>
+                <span className="font-bold text-[#1F2937] uppercase">{selectedOrder.status}</span>
               </div>
               {selectedOrder.readyAt && (
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Kitchen Ready At:</span>
-                  <span className="text-emerald-400">
+                  <span className="text-[#5B6470]">Kitchen Ready At:</span>
+                  <span className="text-emerald-800 font-semibold">
                     {new Date(selectedOrder.readyAt).toLocaleTimeString()}
                   </span>
                 </div>
               )}
               {selectedOrder.servedAt && (
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Customer Served At:</span>
-                  <span className="text-purple-400">
+                  <span className="text-[#5B6470]">Customer Served At:</span>
+                  <span className="text-purple-800 font-semibold">
                     {new Date(selectedOrder.servedAt).toLocaleTimeString()}
                   </span>
                 </div>
               )}
               {selectedOrder.notes && (
-                <div className="pt-2 border-t border-slate-800">
-                  <span className="text-slate-400 block text-[11px]">Special Instructions:</span>
-                  <p className="text-slate-200 text-xs italic">{selectedOrder.notes}</p>
+                <div className="pt-2 border-t border-[#E5D8C6]">
+                  <span className="text-[#5B6470] block text-[11px]">Special Instructions:</span>
+                  <p className="text-[#1F2937] text-xs italic">{selectedOrder.notes}</p>
                 </div>
               )}
             </div>
@@ -378,7 +378,7 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
               {selectedOrder.status === 'READY' && (
                 <button
                   onClick={() => handleServe(selectedOrder.id, selectedOrder.table?.tableNumber || 'Takeaway')}
-                  className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-xl text-xs transition shadow-sandstone flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
                   Mark Served
@@ -387,14 +387,14 @@ export default function WaiterOrdersView({ onSelectTableForOrder }) {
               {selectedOrder.status === 'PENDING' && (
                 <button
                   onClick={() => handleCancelOrder(selectedOrder.id)}
-                  className="py-2 px-4 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-semibold rounded-xl text-xs transition"
+                  className="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold rounded-xl text-xs transition cursor-pointer"
                 >
                   Cancel Order
                 </button>
               )}
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition"
+                className="flex-1 py-2.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] font-semibold rounded-xl text-xs border border-[#E5D8C6] shadow-sandstone transition cursor-pointer"
               >
                 Close
               </button>

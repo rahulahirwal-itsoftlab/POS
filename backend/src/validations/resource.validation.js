@@ -55,9 +55,12 @@ export const validateAvailability = (data) => result(typeof data?.isAvailable ==
 
 export const validateInventoryUpdate = (data) => {
   const errors = [];
-  if (!Object.keys(data || {}).some((key) => ['name', 'sku', 'currentStock', 'minStockThreshold', 'unit', 'costPerUnit'].includes(key))) errors.push('At least one supported field is required');
+  const supported = ['name', 'sku', 'currentStock', 'openingStock', 'minStockThreshold', 'minSafeLevel', 'minStockLevel', 'unit', 'costPerUnit', 'costPrice', 'cost'];
+  if (!Object.keys(data || {}).some((key) => supported.includes(key))) errors.push('At least one supported field is required');
   if (data?.name !== undefined && (typeof data.name !== 'string' || !data.name.trim() || data.name.length > 120)) errors.push('name must be a non-empty string of at most 120 characters');
-  for (const field of ['currentStock', 'minStockThreshold', 'costPerUnit']) if (data?.[field] !== undefined && (!Number.isFinite(Number(data[field])) || Number(data[field]) < 0)) errors.push(`${field} must be non-negative`);
+  for (const field of ['currentStock', 'openingStock', 'minStockThreshold', 'minSafeLevel', 'minStockLevel', 'costPerUnit', 'costPrice', 'cost']) {
+    if (data?.[field] !== undefined && (!Number.isFinite(Number(data[field])) || Number(data[field]) < 0)) errors.push(`${field} must be non-negative`);
+  }
   if (data?.unit !== undefined && !units.includes(data.unit)) errors.push(`unit must be one of ${units.join(', ')}`);
   return result(errors);
 };

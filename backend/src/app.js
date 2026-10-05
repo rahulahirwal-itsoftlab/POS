@@ -21,6 +21,7 @@ import wastageRoutes from './routes/wastage.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import registrationAdminRoutes from './routes/registration-admin.routes.js';
 import planRoutes from './routes/plan.routes.js';
+import settingRoutes from './routes/setting.routes.js';
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/plans', planRoutes);
 app.use('/api/registration-admin', registrationAdminRoutes);
 app.use('/api/super-admin', registrationAdminRoutes);
+app.use('/api/settings', settingRoutes);
 
 // Compatibility Mounts (/api/v1/...)
 app.use('/api/v1/auth', authRoutes);
@@ -77,6 +79,7 @@ app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/plans', planRoutes);
 app.use('/api/v1/registration-admin', registrationAdminRoutes);
 app.use('/api/v1/super-admin', registrationAdminRoutes);
+app.use('/api/v1/settings', settingRoutes);
 
 // 404 Route Not Found Handler
 app.use((req, res) => {

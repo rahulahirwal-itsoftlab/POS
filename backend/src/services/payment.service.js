@@ -41,15 +41,17 @@ export const processPayment = async (restaurantId, data) => {
       }
     }
 
-    const paymentAmount = Number(data.amount);
+    const paymentAmount = Number(data.amount !== undefined ? data.amount : data.amountPaid);
+    const paymentMethod = data.method !== undefined ? data.method : (data.paymentMethod || 'CASH');
+    const transactionReference = data.transactionReference || data.notes || null;
 
     const payment = await tx.payment.create({
       data: {
         billId: bill.id,
         amount: paymentAmount,
-        method: data.method || 'CASH',
+        method: paymentMethod,
         status: 'COMPLETED',
-        transactionReference: data.transactionReference || null,
+        transactionReference,
       },
     });
 

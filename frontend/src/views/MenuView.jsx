@@ -13,7 +13,8 @@ import {
   Sliders,
   Utensils,
   FolderPlus,
-  Layers
+  Layers,
+  X
 } from 'lucide-react';
 
 export default function MenuView() {
@@ -190,7 +191,7 @@ export default function MenuView() {
       {
         inventoryItemId: inventoryItems[0].id,
         quantityRequired: 1,
-        unit: inventoryItems[0].unit || 'kg',
+        unit: inventoryItems[0].unit || 'KG',
       },
     ]);
   };
@@ -226,15 +227,15 @@ export default function MenuView() {
   });
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 min-w-0 bg-[#FAF7F2] min-h-screen text-[#1F2937]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-bold text-[#1F2937] tracking-tight flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-[#92400E]" />
             <span>Menu & Recipe Engineering</span>
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-[#5B6470]">
             Configure dishes, categories, live availability switches, and automated inventory depletion recipes
           </p>
         </div>
@@ -242,9 +243,9 @@ export default function MenuView() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowCatModal(true)}
-            className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-colors"
+            className="flex items-center gap-1.5 bg-white hover:bg-[#F1E8DB] text-[#1F2937] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E5D8C6] shadow-sm transition-all"
           >
-            <FolderPlus className="w-4 h-4 text-emerald-400" />
+            <FolderPlus className="w-4 h-4 text-[#D97706]" />
             <span>Add Category</span>
           </button>
           <button
@@ -261,7 +262,7 @@ export default function MenuView() {
               });
               setShowItemModal(true);
             }}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-950/40"
+            className="flex items-center gap-2 bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-[#92400E]/20"
           >
             <Plus className="w-4 h-4" />
             <span>Add Menu Item</span>
@@ -270,14 +271,14 @@ export default function MenuView() {
       </div>
 
       {/* Categories & Filter Bar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white p-3 rounded-2xl border border-[#E5D8C6] shadow-sm">
         <div className="flex gap-2 overflow-x-auto max-w-3xl pb-1 md:pb-0 scrollbar-none">
           <button
             onClick={() => setSelectedCatId('ALL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
               selectedCatId === 'ALL'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                ? 'bg-[#92400E] text-white shadow-sm'
+                : 'bg-[#FAF7F2] text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB] border border-[#E5D8C6]'
             }`}
           >
             All Categories ({items.length})
@@ -288,8 +289,8 @@ export default function MenuView() {
                 onClick={() => setSelectedCatId(c.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
                   selectedCatId === c.id
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    ? 'bg-[#92400E] text-white shadow-sm'
+                    : 'bg-[#FAF7F2] text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB] border border-[#E5D8C6]'
                 }`}
               >
                 {c.name}
@@ -297,7 +298,7 @@ export default function MenuView() {
               {role === 'RESTAURANT_OWNER' && (
                 <button
                   onClick={() => handleDeleteCategory(c.id, c.name)}
-                  className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 p-1 transition-opacity ml-0.5"
+                  className="opacity-0 group-hover:opacity-100 text-[#5B6470] hover:text-[#EF4444] p-1 transition-opacity ml-0.5"
                   title="Delete category"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -308,30 +309,30 @@ export default function MenuView() {
         </div>
 
         <div className="relative w-full md:w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-[#5B6470] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+            className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#1F2937] placeholder-[#5B6470] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
           />
         </div>
       </div>
 
       {/* Menu Items Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E5D8C6] rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-12 text-center text-slate-400">Loading menu records...</div>
+          <div className="p-12 text-center text-[#5B6470]">Loading menu records...</div>
         ) : filteredItems.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
-            <BookOpen className="w-12 h-12 mx-auto mb-2 text-slate-600" />
-            <p className="text-white font-semibold">No dishes found</p>
+          <div className="p-12 text-center text-[#5B6470]">
+            <BookOpen className="w-12 h-12 mx-auto mb-2 text-[#E7DCCB]" />
+            <p className="text-[#1F2937] font-semibold">No dishes found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] font-bold border-b border-slate-800">
+              <thead className="bg-[#FAF7F2] text-[#5B6470] uppercase text-[10px] font-bold border-b border-[#E5D8C6]">
                 <tr>
                   <th className="px-5 py-3.5">Dish</th>
                   <th className="px-5 py-3.5">Category</th>
@@ -342,37 +343,37 @@ export default function MenuView() {
                   <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#E5D8C6]/60">
                 {filteredItems.map((itm) => {
                   const cat = categories.find((c) => c.id === itm.categoryId);
                   return (
-                    <tr key={itm.id} className="hover:bg-slate-800/30 transition-colors">
+                    <tr key={itm.id} className="hover:bg-[#F1E8DB]/40 transition-colors">
                       <td className="px-5 py-4">
-                        <div className="font-bold text-white text-sm">{itm.name}</div>
+                        <div className="font-bold text-[#1F2937] text-sm">{itm.name}</div>
                         {itm.description && (
-                          <div className="text-[11px] text-slate-400 line-clamp-1 max-w-xs mt-0.5">
+                          <div className="text-[11px] text-[#5B6470] line-clamp-1 max-w-xs mt-0.5">
                             {itm.description}
                           </div>
                         )}
                       </td>
-                      <td className="px-5 py-4 font-semibold text-slate-300">
+                      <td className="px-5 py-4 font-semibold text-[#1F2937]">
                         {cat?.name || 'Unassigned'}
                       </td>
                       <td className="px-5 py-4">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
                             itm.isVeg
-                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                              : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+                              ? 'bg-emerald-50 text-[#16A34A] border-emerald-200'
+                              : 'bg-rose-50 text-[#EF4444] border-rose-200'
                           }`}
                         >
                           {itm.isVeg ? 'Vegetarian' : 'Non-Veg'}
                         </span>
                       </td>
-                      <td className="px-5 py-4 font-mono font-bold text-white text-sm">
+                      <td className="px-5 py-4 font-mono font-bold text-[#1F2937] text-sm">
                         {currency}{Number(itm.price).toFixed(2)}
                       </td>
-                      <td className="px-5 py-4 text-slate-400 font-mono">
+                      <td className="px-5 py-4 text-[#5B6470] font-mono">
                         {itm.preparationTime || 15} mins
                       </td>
                       <td className="px-5 py-4">
@@ -380,18 +381,18 @@ export default function MenuView() {
                           onClick={() => handleToggleAvailability(itm)}
                           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border transition-colors ${
                             itm.isAvailable
-                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30'
-                              : 'bg-rose-500/20 text-rose-400 border-rose-500/30 hover:bg-rose-500/30'
+                              ? 'bg-emerald-50 text-[#16A34A] border-emerald-200 hover:bg-emerald-100'
+                              : 'bg-rose-50 text-[#EF4444] border-rose-200 hover:bg-rose-100'
                           }`}
                         >
                           {itm.isAvailable ? (
                             <>
-                              <ToggleRight className="w-3.5 h-3.5 text-emerald-400" />
+                              <ToggleRight className="w-3.5 h-3.5 text-[#16A34A]" />
                               <span>In Stock</span>
                             </>
                           ) : (
                             <>
-                              <ToggleLeft className="w-3.5 h-3.5 text-rose-400" />
+                              <ToggleLeft className="w-3.5 h-3.5 text-[#EF4444]" />
                               <span>86 Out</span>
                             </>
                           )}
@@ -400,7 +401,7 @@ export default function MenuView() {
                       <td className="px-5 py-4 text-right space-x-2">
                         <button
                           onClick={() => openRecipeModal(itm)}
-                          className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-amber-400 px-2.5 py-1.5 rounded-lg border border-slate-700 font-semibold"
+                          className="inline-flex items-center gap-1 bg-white hover:bg-[#F1E8DB] text-[#D97706] px-2.5 py-1.5 rounded-lg border border-[#E5D8C6] font-semibold transition-colors"
                           title="Manage Recipe BOM"
                         >
                           <Layers className="w-3 h-3" />
@@ -420,13 +421,13 @@ export default function MenuView() {
                             });
                             setShowItemModal(true);
                           }}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                          className="p-1.5 rounded-lg text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB] transition-colors"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDeleteItem(itm.id, itm.name)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30"
+                          className="p-1.5 rounded-lg text-[#5B6470] hover:text-[#EF4444] hover:bg-rose-50 transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -442,40 +443,50 @@ export default function MenuView() {
 
       {/* CREATE / EDIT ITEM MODAL */}
       {showItemModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-1">
-              {editingItem ? 'Edit Dish' : 'Add New Menu Item'}
-            </h3>
-            <p className="text-xs text-slate-400 mb-5">Configure dish information, pricing, and category</p>
-
-            <form onSubmit={handleSaveItem} className="space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E5D8C6] rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5D8C6]">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Dish Name *</label>
+                <h3 className="text-lg font-bold text-[#1F2937]">
+                  {editingItem ? 'Edit Dish' : 'Add New Menu Item'}
+                </h3>
+                <p className="text-xs text-[#5B6470]">Configure dish information, pricing, and category</p>
+              </div>
+              <button
+                onClick={() => setShowItemModal(false)}
+                className="text-[#5B6470] hover:text-[#1F2937] p-1.5 rounded-lg hover:bg-[#F1E8DB]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveItem} className="space-y-4 mt-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#1F2937] mb-1">Dish Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Truffle Mushroom Risotto"
                   value={itemForm.name}
                   onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-sm text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Description</label>
+                <label className="block text-xs font-semibold text-[#1F2937] mb-1">Description</label>
                 <textarea
                   rows="2"
                   placeholder="Fresh arborio rice with wild forest mushrooms and aged parmesan"
                   value={itemForm.description}
                   onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-xs text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                 ></textarea>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">
                     Price ({currency}) *
                   </label>
                   <input
@@ -484,16 +495,16 @@ export default function MenuView() {
                     required
                     value={itemForm.price}
                     onChange={(e) => setItemForm({ ...itemForm, price: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-sm text-[#1F2937] font-mono focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Category *</label>
+                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">Category *</label>
                   <select
                     required
                     value={itemForm.categoryId}
                     onChange={(e) => setItemForm({ ...itemForm, categoryId: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-sm text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                   >
                     <option value="">Select Category</option>
                     {categories.map((c) => (
@@ -507,25 +518,25 @@ export default function MenuView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Prep Time (mins)</label>
+                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">Prep Time (mins)</label>
                   <input
                     type="number"
                     min="1"
                     value={itemForm.preparationTime}
                     onChange={(e) => setItemForm({ ...itemForm, preparationTime: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-sm text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Dietary Preference</label>
+                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">Dietary Preference</label>
                   <div className="flex gap-2 mt-1">
                     <button
                       type="button"
                       onClick={() => setItemForm({ ...itemForm, isVeg: true })}
                       className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                         itemForm.isVeg
-                          ? 'bg-emerald-600 text-white border-emerald-500'
-                          : 'bg-slate-950 text-slate-400 border-slate-800'
+                          ? 'bg-[#16A34A] text-white border-[#16A34A]'
+                          : 'bg-[#FAF7F2] text-[#5B6470] border-[#E5D8C6]'
                       }`}
                     >
                       Veg
@@ -535,8 +546,8 @@ export default function MenuView() {
                       onClick={() => setItemForm({ ...itemForm, isVeg: false })}
                       className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                         !itemForm.isVeg
-                          ? 'bg-rose-600 text-white border-rose-500'
-                          : 'bg-slate-950 text-slate-400 border-slate-800'
+                          ? 'bg-[#EF4444] text-white border-[#EF4444]'
+                          : 'bg-[#FAF7F2] text-[#5B6470] border-[#E5D8C6]'
                       }`}
                     >
                       Non-Veg
@@ -545,17 +556,17 @@ export default function MenuView() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-[#E5D8C6]">
                 <button
                   type="button"
                   onClick={() => setShowItemModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-semibold text-[#5B6470] hover:text-[#1F2937]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2 rounded-xl transition-all shadow-md shadow-emerald-950/40"
+                  className="bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold px-5 py-2 rounded-xl transition-all shadow-md shadow-[#92400E]/20"
                 >
                   {editingItem ? 'Update Dish' : 'Save Dish'}
                 </button>
@@ -567,32 +578,42 @@ export default function MenuView() {
 
       {/* CREATE CATEGORY MODAL */}
       {showCatModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-1">Add Menu Category</h3>
-            <p className="text-xs text-slate-400 mb-5">Group items into logical sections (e.g. Starters, Main, Cocktails)</p>
-
-            <form onSubmit={handleCreateCategory} className="space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E5D8C6] rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5D8C6]">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Category Name *</label>
+                <h3 className="text-lg font-bold text-[#1F2937]">Add Menu Category</h3>
+                <p className="text-xs text-[#5B6470]">Group items into logical sections (e.g. Starters, Main, Cocktails)</p>
+              </div>
+              <button
+                onClick={() => setShowCatModal(false)}
+                className="text-[#5B6470] hover:text-[#1F2937] p-1.5 rounded-lg hover:bg-[#F1E8DB]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCategory} className="space-y-4 mt-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#1F2937] mb-1">Category Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Woodfired Pizzas"
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-sm text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Description (Optional)</label>
+                <label className="block text-xs font-semibold text-[#1F2937] mb-1">Description (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Hand-stretched artisanal sourdough pizzas"
                   value={newCatDesc}
                   onChange={(e) => setNewCatDesc(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-xs text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                 />
               </div>
 
@@ -600,13 +621,13 @@ export default function MenuView() {
                 <button
                   type="button"
                   onClick={() => setShowCatModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-semibold text-[#5B6470] hover:text-[#1F2937]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2 rounded-xl transition-all shadow-md shadow-emerald-950/40"
+                  className="bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold px-5 py-2 rounded-xl transition-all shadow-md shadow-[#92400E]/20"
                 >
                   Create Category
                 </button>
@@ -618,36 +639,36 @@ export default function MenuView() {
 
       {/* RECIPE BOM DRAWER */}
       {showRecipeModal && selectedItemForRecipe && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-xl bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-end">
+          <div className="w-full max-w-xl bg-white border-l border-[#E5D8C6] h-full flex flex-col shadow-2xl p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E5D8C6]">
               <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-amber-400" />
+                <h3 className="text-base font-bold text-[#1F2937] flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-[#D97706]" />
                   <span>Recipe Bill of Materials (BOM)</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Linked to <span className="font-bold text-white">{selectedItemForRecipe.name}</span>
+                <p className="text-xs text-[#5B6470] mt-0.5">
+                  Linked to <span className="font-bold text-[#1F2937]">{selectedItemForRecipe.name}</span>
                 </p>
               </div>
               <button
                 onClick={() => setShowRecipeModal(false)}
-                className="text-slate-400 hover:text-white p-1"
+                className="text-[#5B6470] hover:text-[#1F2937] p-1.5 rounded-lg hover:bg-[#F1E8DB]"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto py-5 space-y-4">
-              <p className="text-xs text-slate-400 leading-relaxed bg-amber-950/20 p-3 rounded-xl border border-amber-900/40">
+              <p className="text-xs text-[#5B6470] leading-relaxed bg-[#FAF7F2] p-3 rounded-xl border border-[#E5D8C6]">
                 Whenever the kitchen completes an order containing this dish, these inventory raw materials will be automatically decremented from warehouse stocks.
               </p>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-300">Ingredients Breakdown</span>
+                <span className="text-xs font-bold text-[#1F2937]">Ingredients Breakdown</span>
                 <button
                   onClick={handleAddRecipeRow}
-                  className="flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300"
+                  className="flex items-center gap-1 text-xs font-semibold text-[#92400E] hover:text-[#78350F]"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Ingredient</span>
@@ -655,7 +676,7 @@ export default function MenuView() {
               </div>
 
               {recipeIngredients.length === 0 ? (
-                <div className="text-center py-12 text-slate-500 text-xs">
+                <div className="text-center py-12 text-[#5B6470] text-xs">
                   No recipe ingredients configured yet. Click "Add Ingredient" to link raw materials.
                 </div>
               ) : (
@@ -663,7 +684,7 @@ export default function MenuView() {
                   {recipeIngredients.map((ing, idx) => (
                     <div
                       key={idx}
-                      className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center gap-3"
+                      className="bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl p-3 flex items-center gap-3"
                     >
                       <select
                         value={ing.inventoryItemId}
@@ -677,7 +698,7 @@ export default function MenuView() {
                             )
                           );
                         }}
-                        className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                        className="flex-1 bg-white border border-[#E5D8C6] rounded-lg px-2.5 py-1.5 text-xs text-[#1F2937]"
                       >
                         {inventoryItems.map((inv) => (
                           <option key={inv.id} value={inv.id}>
@@ -697,16 +718,16 @@ export default function MenuView() {
                             prev.map((r, i) => (i === idx ? { ...r, quantityRequired: e.target.value } : r))
                           )
                         }
-                        className="w-20 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
+                        className="w-20 bg-white border border-[#E5D8C6] rounded-lg px-2.5 py-1.5 text-xs text-[#1F2937] font-mono"
                       />
 
-                      <span className="text-xs text-slate-400 font-mono w-12">{ing.unit || 'unit'}</span>
+                      <span className="text-xs text-[#5B6470] font-mono w-12">{ing.unit || 'unit'}</span>
 
                       <button
                         onClick={() =>
                           setRecipeIngredients((prev) => prev.filter((_, i) => i !== idx))
                         }
-                        className="text-slate-500 hover:text-rose-400 p-1"
+                        className="text-[#5B6470] hover:text-[#EF4444] p-1"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -716,16 +737,16 @@ export default function MenuView() {
               )}
             </div>
 
-            <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
+            <div className="pt-4 border-t border-[#E5D8C6] flex justify-end gap-3">
               <button
                 onClick={() => setShowRecipeModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 text-xs font-semibold text-[#5B6470] hover:text-[#1F2937]"
               >
                 Close
               </button>
               <button
                 onClick={handleSaveRecipe}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md"
+                className="bg-[#92400E] hover:bg-[#78350F] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-[#92400E]/20"
               >
                 Save Recipe
               </button>

@@ -55,6 +55,20 @@ export const updateStock = async (req, res, next) => {
   }
 };
 
+export const adjustStock = async (req, res, next) => {
+  try {
+    const item = await inventoryService.adjustStock(
+      req.user.restaurantId,
+      req.params.id,
+      req.body,
+      req.user
+    );
+    return sendSuccess(res, 200, 'Inventory stock adjusted successfully', item);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getLowStockItems = async (req, res, next) => {
   try {
     const items = await inventoryService.getLowStockItems(req.user.restaurantId);
@@ -64,12 +78,23 @@ export const getLowStockItems = async (req, res, next) => {
   }
 };
 
+export const getInventoryTransactions = async (req, res, next) => {
+  try {
+    const transactions = await inventoryService.getInventoryTransactions(req.user.restaurantId, req.query);
+    return sendSuccess(res, 200, 'Inventory transactions retrieved successfully', transactions);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createInventoryItem,
   getInventoryItems,
+  getInventoryTransactions,
   getInventoryItemById,
   updateInventoryItem,
   deleteInventoryItem,
   updateStock,
+  adjustStock,
   getLowStockItems,
 };

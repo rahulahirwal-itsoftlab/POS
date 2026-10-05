@@ -8,6 +8,10 @@ export const posService = {
     me: () => api.get('/auth/me'),
     updateProfile: (data) => api.put('/auth/profile', data),
     changePassword: (data) => api.put('/auth/password', data),
+    forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+    resendResetOtp: (email) => api.post('/auth/resend-reset-otp', { email }),
+    verifyResetOtp: (email, otp) => api.post('/auth/verify-reset-otp', { email, otp }),
+    resetPassword: (resetToken, newPassword) => api.post('/auth/reset-password', { resetToken, newPassword }),
   },
 
   // Tables
@@ -130,7 +134,12 @@ export const posService = {
     create: (data) => api.post('/inventory', data),
     update: (id, data) => api.put(`/inventory/${id}`, data),
     adjustStock: (id, data) => api.patch(`/inventory/${id}/adjust`, data),
-    getLowStockAlerts: () => api.get('/inventory/alerts/low-stock'),
+    delete: (id) => api.delete(`/inventory/${id}`),
+    getTransactions: (params = {}) => {
+      const q = new URLSearchParams(params).toString();
+      return api.get(`/inventory/transactions${q ? `?${q}` : ''}`);
+    },
+    getLowStockAlerts: () => api.get('/inventory/low-stock'),
   },
 
   // Suppliers
@@ -150,6 +159,8 @@ export const posService = {
     },
     getById: (id) => api.get(`/purchases/${id}`),
     create: (data) => api.post('/purchases', data),
+    receive: (id) => api.patch(`/purchases/${id}/receive`),
+    cancel: (id) => api.patch(`/purchases/${id}/cancel`),
     updateStatus: (id, status) => api.patch(`/purchases/${id}/status`, { status }),
   },
 
@@ -190,10 +201,16 @@ export const posService = {
     delete: (id) => api.delete(`/users/${id}`),
   },
 
-  // Restaurant Settings
+  // Restaurant Profile & Configuration
   restaurant: {
     getDetails: () => api.get('/restaurants'),
-    update: (data) => api.put('/restaurants', data),
+    update: (id, data) => api.patch(`/restaurants/${id}`, data),
+  },
+
+  // Dynamic Settings (Platform, Restaurant, User Scopes)
+  settings: {
+    get: () => api.get('/settings'),
+    update: (scope, key, value) => api.put(`/settings/${scope}/${key}`, { value }),
   },
 
   // Level 1: Platform Super Admin / Registration Administration

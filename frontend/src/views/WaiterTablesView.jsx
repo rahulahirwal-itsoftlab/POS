@@ -84,19 +84,19 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 min-w-0">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5D8C6] shadow-sandstone">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
+            <div className="p-2.5 bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl text-[#92400E]">
               <LayoutGrid className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-[#1F2937] flex items-center gap-2">
                 Floor Tables Management
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#5B6470]">
                 Operational table assignments, seating, and live order states
               </p>
             </div>
@@ -106,25 +106,25 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
         {/* Search & Filters */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#5B6470] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search table number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#1F2937] placeholder-[#5B6470] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-xl border border-[#E5D8C6] text-xs">
             {['ALL', 'AVAILABLE', 'PREPARING', 'READY', 'SERVED'].map((st) => (
               <button
                 key={st}
                 onClick={() => setFilterStatus(st)}
-                className={`px-3 py-1 rounded-lg font-medium transition ${
+                className={`px-3 py-1 rounded-lg font-semibold transition cursor-pointer ${
                   filterStatus === st
-                    ? 'bg-indigo-600 text-white shadow'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#92400E] text-white shadow-sandstone'
+                    : 'text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB]'
                 }`}
               >
                 {st}
@@ -136,12 +136,12 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
 
       {/* Tables Grid */}
       {loading ? (
-        <div className="py-20 flex justify-center items-center text-slate-400 text-sm">
-          <RefreshCw className="w-6 h-6 animate-spin text-indigo-400 mr-2" />
+        <div className="py-20 flex justify-center items-center text-[#5B6470] text-sm">
+          <RefreshCw className="w-6 h-6 animate-spin text-[#92400E] mr-2" />
           Loading floor tables...
         </div>
       ) : filteredTables.length === 0 ? (
-        <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800/60 text-slate-400 text-sm">
+        <div className="text-center py-16 bg-white rounded-2xl border border-[#E5D8C6] text-[#5B6470] text-sm shadow-sandstone">
           No tables found matching your search and filter criteria.
         </div>
       ) : (
@@ -157,41 +157,41 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
             return (
               <div
                 key={t.id}
-                className={`flex flex-col justify-between p-5 rounded-2xl border transition shadow-lg ${
+                className={`flex flex-col justify-between p-5 rounded-2xl border transition shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 ${
                   isReady
-                    ? 'bg-amber-950/30 border-amber-500/70 shadow-amber-950/20'
+                    ? 'bg-rose-50/40 border-rose-300'
                     : isCooking
-                    ? 'bg-slate-900/90 border-blue-500/40'
+                    ? 'bg-amber-50/40 border-amber-300'
                     : isServed
-                    ? 'bg-purple-950/20 border-purple-500/30'
+                    ? 'bg-blue-50/30 border-blue-200'
                     : isAvailable
-                    ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
-                    : 'bg-slate-900/70 border-slate-800'
+                    ? 'bg-white border-[#E5D8C6] hover:border-[#92400E]'
+                    : 'bg-white border-[#E5D8C6]'
                 }`}
               >
                 {/* Header */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <h3 className="text-lg font-bold text-white flex items-center gap-1.5">
+                      <h3 className="text-lg font-bold text-[#1F2937] flex items-center gap-1.5">
                         Table {t.tableNumber}
                       </h3>
-                      <span className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                      <span className="text-xs text-[#5B6470] flex items-center gap-1 mt-0.5 font-medium">
                         <Users className="w-3.5 h-3.5" /> {t.capacity} Guests
                       </span>
                     </div>
 
                     <span
-                      className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full ${
+                      className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full border ${
                         isReady
-                          ? 'bg-amber-500 text-slate-950 animate-pulse font-extrabold'
+                          ? 'bg-rose-100 text-rose-800 border-rose-200 animate-pulse font-extrabold'
                           : isCooking
-                          ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                          ? 'bg-amber-100 text-amber-900 border-amber-200'
                           : isPending
-                          ? 'bg-slate-700 text-slate-300'
+                          ? 'bg-slate-100 text-slate-700 border-slate-200'
                           : isServed
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-blue-100 text-blue-800 border-blue-200'
+                          : 'bg-emerald-100 text-emerald-800 border-emerald-200'
                       }`}
                     >
                       {activeOrder ? activeOrder.status : t.status}
@@ -200,23 +200,23 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
 
                   {/* Active Order Details */}
                   {activeOrder ? (
-                    <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 space-y-2 text-xs my-3">
+                    <div className="bg-[#FAF7F2] p-3 rounded-xl border border-[#E5D8C6] space-y-2 text-xs my-3">
                       <div className="flex justify-between items-center">
-                        <span className="font-semibold text-white">#{activeOrder.orderNumber}</span>
-                        <span className="text-slate-400">
+                        <span className="font-bold text-[#1F2937]">#{activeOrder.orderNumber}</span>
+                        <span className="text-[#5B6470] font-medium">
                           {activeOrder.items?.length || 0} Dish
                           {(activeOrder.items?.length || 0) > 1 ? 'es' : ''}
                         </span>
                       </div>
 
                       {activeOrder.items && activeOrder.items.length > 0 && (
-                        <div className="text-[11px] text-slate-400 space-y-0.5 max-h-20 overflow-y-auto pr-1">
+                        <div className="text-[11px] text-[#5B6470] space-y-0.5 max-h-20 overflow-y-auto pr-1">
                           {activeOrder.items.map((i, idx) => (
                             <div key={idx} className="flex justify-between">
-                              <span className="truncate pr-2">
+                              <span className="truncate pr-2 font-medium">
                                 {i.quantity}x {i.menuItem?.name}
                               </span>
-                              <span className="text-slate-300 font-mono">
+                              <span className="text-[#92400E] font-mono font-bold">
                                 {restaurant?.currency || '₹'}
                                 {Number(i.subtotal || 0).toFixed(2)}
                               </span>
@@ -226,11 +226,11 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                       )}
 
                       {activeOrder.bill && (
-                        <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-[11px]">
-                          <span className="text-slate-400">Bill Status:</span>
+                        <div className="pt-2 border-t border-[#E5D8C6] flex justify-between items-center text-[11px]">
+                          <span className="text-[#5B6470]">Bill Status:</span>
                           <span
-                            className={`font-semibold ${
-                              activeOrder.bill.status === 'PAID' ? 'text-emerald-400' : 'text-amber-400'
+                            className={`font-bold ${
+                              activeOrder.bill.status === 'PAID' ? 'text-emerald-800' : 'text-[#92400E]'
                             }`}
                           >
                             {activeOrder.bill.status} ({restaurant?.currency || '₹'}
@@ -240,19 +240,19 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                       )}
                     </div>
                   ) : (
-                    <div className="my-8 text-center text-slate-500 text-xs italic">
+                    <div className="my-8 text-center text-[#9CA3AF] text-xs italic">
                       Ready for next seated party
                     </div>
                   )}
                 </div>
 
                 {/* Contextual Action Button */}
-                <div className="pt-3 border-t border-slate-800/60">
+                <div className="pt-3 border-t border-[#E5D8C6]">
                   {isReady ? (
                     <button
                       onClick={() => handleServeOrder(activeOrder.id, t.tableNumber)}
                       disabled={actionLoading === `serve-${activeOrder.id}`}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-950 flex items-center justify-center gap-1.5 transition"
+                      className="w-full py-2.5 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
                       <Check className="w-4 h-4" />
                       SERVE FOOD
@@ -261,7 +261,7 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                     <button
                       onClick={() => handleDeliverBill(activeOrder.bill.id, t.tableNumber)}
                       disabled={actionLoading === `deliver-${activeOrder.bill.id}`}
-                      className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-sky-950 flex items-center justify-center gap-1.5 transition"
+                      className="w-full py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
                       <Receipt className="w-4 h-4" />
                       DELIVER BILL
@@ -269,7 +269,7 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                   ) : isAvailable ? (
                     <button
                       onClick={() => onSelectTableForOrder && onSelectTableForOrder(t)}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-950 flex items-center justify-center gap-1.5 transition"
+                      className="w-full py-2.5 bg-[#92400E] hover:bg-[#78350F] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
                       <PlusCircle className="w-4 h-4" />
                       NEW ORDER
@@ -277,7 +277,7 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                   ) : (
                     <button
                       onClick={() => onSelectTableForOrder && onSelectTableForOrder(t)}
-                      className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition"
+                      className="w-full py-2.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] font-semibold rounded-xl text-xs border border-[#E5D8C6] shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
                       <PlusCircle className="w-4 h-4" />
                       ADD ITEMS TO ORDER

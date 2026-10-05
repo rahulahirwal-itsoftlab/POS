@@ -50,22 +50,22 @@ export default function WaiterMenuView() {
   });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 min-w-0">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5D8C6] shadow-sandstone">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400">
+            <div className="p-2.5 bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl text-[#92400E]">
               <UtensilsCrossed className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-[#1F2937] flex items-center gap-2">
                 Restaurant Menu Catalog
-                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#5B6470] border border-[#E5D8C6] font-medium">
                   Read Only
                 </span>
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#5B6470]">
                 Browse official dish prices, categories, and kitchen availability
               </p>
             </div>
@@ -75,13 +75,13 @@ export default function WaiterMenuView() {
         {/* Search */}
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#5B6470] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search dishes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-64"
+              className="bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#1F2937] placeholder-[#5B6470] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E] w-64"
             />
           </div>
         </div>
@@ -91,11 +91,10 @@ export default function WaiterMenuView() {
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         <button
           onClick={() => setSelectedCategory('ALL')}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
-            selectedCategory === 'ALL'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950'
-              : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${selectedCategory === 'ALL'
+              ? 'bg-[#92400E] text-white shadow-sandstone font-bold'
+              : 'bg-white text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB] border border-[#E5D8C6] shadow-sandstone'
+            }`}
         >
           All Items ({menuItems.length})
         </button>
@@ -105,11 +104,10 @@ export default function WaiterMenuView() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
-                selectedCategory === cat.id
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${selectedCategory === cat.id
+                  ? 'bg-[#92400E] text-white shadow-sandstone font-bold'
+                  : 'bg-white text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB] border border-[#E5D8C6] shadow-sandstone'
+                }`}
             >
               {cat.name} ({count})
             </button>
@@ -119,12 +117,12 @@ export default function WaiterMenuView() {
 
       {/* Menu Grid */}
       {loading ? (
-        <div className="py-20 flex justify-center items-center text-slate-400 text-sm">
-          <RefreshCw className="w-6 h-6 animate-spin text-emerald-400 mr-2" />
+        <div className="py-20 flex justify-center items-center text-[#5B6470] text-sm">
+          <RefreshCw className="w-6 h-6 animate-spin text-[#92400E] mr-2" />
           Loading menu catalog...
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800 text-slate-500 text-sm">
+        <div className="text-center py-16 bg-white rounded-2xl border border-[#E5D8C6] text-[#9CA3AF] text-sm shadow-sandstone">
           No menu items found.
         </div>
       ) : (
@@ -136,41 +134,40 @@ export default function WaiterMenuView() {
             return (
               <div
                 key={item.id}
-                className="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-4 shadow-lg flex flex-col justify-between transition group"
+                className="bg-white border border-[#E5D8C6] hover:border-[#92400E] rounded-2xl p-5 shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 flex flex-col justify-between transition group"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-[11px] font-medium text-emerald-400/90 px-2 py-0.5 bg-emerald-950/40 border border-emerald-500/20 rounded-lg">
+                    <span className="text-[11px] font-semibold text-[#92400E] px-2.5 py-0.5 bg-[#FAF7F2] border border-[#E5D8C6] rounded-lg">
                       {categoryName}
                     </span>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                        isAvail
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                      }`}
+                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border ${isAvail
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-rose-50 text-rose-800 border-rose-200'
+                        }`}
                     >
                       {isAvail ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                       {isAvail ? 'Available' : 'Unavailable'}
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-white text-sm group-hover:text-emerald-400 transition">
+                  <h3 className="font-bold text-[#1F2937] text-sm group-hover:text-[#92400E] transition">
                     {item.name}
                   </h3>
                   {item.description && (
-                    <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[#5B6470] mt-1 line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-800/80 mt-3 flex items-center justify-between">
-                  <span className="text-base font-extrabold text-white font-mono">
+                <div className="pt-3 border-t border-[#E5D8C6] mt-4 flex items-center justify-between">
+                  <span className="text-base font-extrabold text-[#92400E] font-mono">
                     {currency}
                     {Number(item.price).toFixed(2)}
                   </span>
-                  <span className="text-[11px] text-slate-500">Official Price</span>
+                  <span className="text-[11px] text-[#5B6470] font-medium">Official Price</span>
                 </div>
               </div>
             );

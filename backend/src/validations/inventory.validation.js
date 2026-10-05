@@ -7,13 +7,20 @@ export const validateCreateInventory = (data) => {
   if (!data?.unit || !validUnits.includes(data.unit)) {
     errors.push(`unit must be one of: ${validUnits.join(', ')}`);
   }
-  if (data?.currentStock !== undefined && (isNaN(Number(data.currentStock)) || Number(data.currentStock) < 0)) {
+  const currentStock = data?.currentStock !== undefined ? data.currentStock : data?.openingStock;
+  if (currentStock !== undefined && currentStock !== null && currentStock !== '' && (!Number.isFinite(Number(currentStock)) || Number(currentStock) < 0)) {
     errors.push('currentStock cannot be negative');
   }
-  if (data?.minStockThreshold !== undefined && (isNaN(Number(data.minStockThreshold)) || Number(data.minStockThreshold) < 0)) {
+  const minStockThreshold = data?.minStockThreshold !== undefined
+    ? data.minStockThreshold
+    : (data?.minSafeLevel !== undefined ? data.minSafeLevel : data?.minStockLevel);
+  if (minStockThreshold !== undefined && minStockThreshold !== null && minStockThreshold !== '' && (!Number.isFinite(Number(minStockThreshold)) || Number(minStockThreshold) < 0)) {
     errors.push('minStockThreshold cannot be negative');
   }
-  if (data?.costPerUnit !== undefined && (isNaN(Number(data.costPerUnit)) || Number(data.costPerUnit) < 0)) {
+  const costPerUnit = data?.costPerUnit !== undefined
+    ? data.costPerUnit
+    : (data?.costPrice !== undefined ? data.costPrice : data?.cost);
+  if (costPerUnit !== undefined && costPerUnit !== null && costPerUnit !== '' && (!Number.isFinite(Number(costPerUnit)) || Number(costPerUnit) < 0)) {
     errors.push('costPerUnit cannot be negative');
   }
   return { isValid: errors.length === 0, errors };
@@ -33,7 +40,34 @@ export const validateStockUpdate = (data) => {
   return { isValid: errors.length === 0, errors };
 };
 
+export const validateStockAdjustment = (data) => {
+  const errors = [];
+  const rawAdjustment = data?.quantityAdjustment !== undefined
+    ? data.quantityAdjustment
+    : (data?.quantity !== undefined ? data.quantity : data?.adjustment);
+
+  if (rawAdjustment === undefined || rawAdjustment === null || (typeof rawAdjustment === 'string' && rawAdjustment.trim() === '')) {
+    errors.push('quantityAdjustment is required');
+  } else if (!Number.isFinite(Number(rawAdjustment))) {
+    errors.push('quantityAdjustment must be a valid number');
+  } else if (Number(rawAdjustment) === 0) {
+    errors.push('quantityAdjustment cannot be zero');
+  }
+
+  const reason = data?.reason;
+  if (!reason || typeof reason !== 'string' || !reason.trim()) {
+    errors.push('reason is required');
+  }
+
+  if (data?.auditNotes !== undefined && data.auditNotes !== null && typeof data.auditNotes !== 'string') {
+    errors.push('auditNotes must be a string');
+  }
+
+  return { isValid: errors.length === 0, errors };
+};
+
 export default {
   validateCreateInventory,
   validateStockUpdate,
+  validateStockAdjustment,
 };

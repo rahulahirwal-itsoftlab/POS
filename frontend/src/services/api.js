@@ -58,7 +58,14 @@ async function request(endpoint, options = {}) {
     const error = new Error(errorMsg);
     error.status = res.status;
     error.data = json;
-    if (res.status === 401) {
+    const isAuthRoute =
+      endpoint.includes('/auth/login') ||
+      endpoint.includes('/auth/forgot-password') ||
+      endpoint.includes('/auth/resend-reset-otp') ||
+      endpoint.includes('/auth/verify-reset-otp') ||
+      endpoint.includes('/auth/reset-password');
+
+    if (res.status === 401 && !isAuthRoute) {
       window.dispatchEvent(new CustomEvent('pos_unauthorized'));
     }
     throw error;

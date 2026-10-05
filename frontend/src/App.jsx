@@ -6,6 +6,7 @@ import Toast from './components/Toast';
 
 // Views
 import LoginView from './views/LoginView';
+import ForgotPasswordView from './views/ForgotPasswordView';
 import RegistrationAdminDashboard from './views/RegistrationAdminDashboard';
 import FloorMapView from './views/FloorMapView';
 import PosTerminalView from './views/PosTerminalView';
@@ -32,7 +33,66 @@ import { UtensilsCrossed, RefreshCw } from 'lucide-react';
 function PosDashboard() {
   const { user, role, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [settingsSubTab, setSettingsSubTab] = useState('profile');
   const [selectedTable, setSelectedTable] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('apexpos_sidebar_collapsed') === 'true';
+  });
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  // Standalone auth routing (/login, /forgot-password, /verify-otp, /reset-password)
+  const [authRoute, setAuthRoute] = useState(() => {
+    const p = window.location.pathname;
+    if (p.includes('/forgot-password') || p.includes('/verify-otp') || p.includes('/reset-password')) {
+      return p;
+    }
+    return '/login';
+  });
+
+  const navigateAuth = (path) => {
+    setAuthRoute(path);
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const p = window.location.pathname;
+      if (p.includes('/forgot-password') || p.includes('/verify-otp') || p.includes('/reset-password')) {
+        setAuthRoute(p);
+      } else {
+        setAuthRoute('/login');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('apexpos_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
+
+  const navigateToSettings = (subTab = 'profile') => {
+    setSettingsSubTab(subTab);
+    setActiveTab('settings');
+  };
+
+  // Keyboard shortcut Ctrl+B or Cmd+B to toggle sidebar collapse
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Set default tab based on role when role changes
   useEffect(() => {
@@ -51,12 +111,12 @@ function PosDashboard() {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-2xl shadow-emerald-950/60 animate-pulse">
+      <div className="h-screen w-screen bg-[#FAF7F2] flex flex-col items-center justify-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#92400E] to-[#D97706] flex items-center justify-center shadow-xl shadow-[#92400E]/20 animate-pulse">
           <UtensilsCrossed className="w-8 h-8 text-white" />
         </div>
-        <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-          <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+        <div className="flex items-center gap-2 text-[#5B6470] text-sm font-medium">
+          <RefreshCw className="w-4 h-4 animate-spin text-[#92400E]" />
           <span>Starting ApexPOS terminal...</span>
         </div>
       </div>
@@ -64,9 +124,21 @@ function PosDashboard() {
   }
 
   if (!user) {
+    const isForgotFlow =
+      authRoute.includes('/forgot-password') ||
+      authRoute.includes('/verify-otp') ||
+      authRoute.includes('/reset-password');
+
     return (
       <>
-        <LoginView />
+        {isForgotFlow ? (
+          <ForgotPasswordView
+            onNavigateToLogin={() => navigateAuth('/login')}
+            onNavigate={navigateAuth}
+          />
+        ) : (
+          <LoginView onNavigateToForgotPassword={() => navigateAuth('/forgot-password')} />
+        )}
         <Toast />
       </>
     );
@@ -83,14 +155,33 @@ function PosDashboard() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="h-screen w-screen flex flex-col bg-[#FAF7F2] text-[#1F2937] overflow-hidden font-sans">
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        navigateToSettings={navigateToSettings}
+        sidebarCollapsed={sidebarCollapsed}
+        toggleSidebar={toggleSidebar}
+        mobileSidebarOpen={mobileSidebarOpen}
+        setMobileSidebarOpen={setMobileSidebarOpen}
+      />
 
-      <div className="flex-1 flex overflow-hidden">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="flex-1 flex overflow-hidden relative">
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          navigateToSettings={navigateToSettings}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+          toggleSidebar={toggleSidebar}
+          mobileOpen={mobileSidebarOpen}
+          setMobileOpen={setMobileSidebarOpen}
+        />
 
-        <main className="flex-1 overflow-y-auto bg-slate-950/60">
-          {role === 'RESTAURANT_REGISTRATION_ADMIN' ? (
+        <main className="flex-1 overflow-y-auto bg-[#FAF7F2] min-w-0">
+          {activeTab === 'settings' ? (
+            <SettingsView initialTab={settingsSubTab} onTabChange={setSettingsSubTab} />
+          ) : role === 'RESTAURANT_REGISTRATION_ADMIN' ? (
             <RegistrationAdminDashboard />
           ) : (
             <>
@@ -179,10 +270,6 @@ function PosDashboard() {
 
               {activeTab === 'staff' && role === 'RESTAURANT_OWNER' && (
                 <StaffView />
-              )}
-
-              {activeTab === 'settings' && (role === 'RESTAURANT_OWNER' || role === 'KITCHEN_ADMIN' || role === 'WAITER') && (
-                <SettingsView />
               )}
             </>
           )}
