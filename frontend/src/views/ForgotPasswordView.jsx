@@ -19,7 +19,7 @@ import posService from '../services/pos.service';
 import { useAuth } from '../context/AuthContext';
 
 /**
- * Production-Grade Forgot Password / Password Reset Flow for ApexPOS
+ * Production-Grade Forgot Password / Password Reset Flow for POS
  * Supports /forgot-password, /verify-otp, /reset-password, and success states
  */
 export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateToLogin, onNavigate }) {
@@ -34,9 +34,9 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
   });
 
   // Flow State
-  const [email, setEmail] = useState(() => sessionStorage.getItem('apexpos_reset_email') || '');
+  const [email, setEmail] = useState(() => sessionStorage.getItem('pos_reset_email') || '');
   const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
-  const [resetToken, setResetToken] = useState(() => sessionStorage.getItem('apexpos_reset_token') || '');
+  const [resetToken, setResetToken] = useState(() => sessionStorage.getItem('pos_reset_token') || '');
 
   // Form states
   const [newPassword, setNewPassword] = useState('');
@@ -135,7 +135,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
     setLoading(true);
     try {
       const res = await posService.auth.forgotPassword(cleanEmail);
-      sessionStorage.setItem('apexpos_reset_email', cleanEmail);
+      sessionStorage.setItem('pos_reset_email', cleanEmail);
       addToast(res.message || 'Verification code sent to your email.', 'info');
       setResendCooldown(45);
       setOtpValues(['', '', '', '', '', '']);
@@ -228,7 +228,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
         throw new Error('Verification succeeded but reset token was not received.');
       }
       setResetToken(token);
-      sessionStorage.setItem('apexpos_reset_token', token);
+      sessionStorage.setItem('pos_reset_token', token);
       addToast('Verification code confirmed!', 'success');
       navigateTo('reset', '/reset-password');
     } catch (err) {
@@ -255,7 +255,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
       return;
     }
 
-    const tokenToUse = resetToken || sessionStorage.getItem('apexpos_reset_token');
+    const tokenToUse = resetToken || sessionStorage.getItem('pos_reset_token');
     if (!tokenToUse) {
       setErrorMsg('Your reset session has expired. Please restart the verification flow.');
       return;
@@ -264,8 +264,8 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
     setLoading(true);
     try {
       await posService.auth.resetPassword(tokenToUse, newPassword);
-      sessionStorage.removeItem('apexpos_reset_email');
-      sessionStorage.removeItem('apexpos_reset_token');
+      sessionStorage.removeItem('pos_reset_email');
+      sessionStorage.removeItem('pos_reset_token');
       addToast('Password updated successfully!', 'success');
       setStep('success');
       window.history.pushState({ step: 'success' }, '', '/login');
@@ -277,8 +277,8 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
   };
 
   const handleReturnToLogin = () => {
-    sessionStorage.removeItem('apexpos_reset_email');
-    sessionStorage.removeItem('apexpos_reset_token');
+    sessionStorage.removeItem('pos_reset_email');
+    sessionStorage.removeItem('pos_reset_token');
     if (onNavigateToLogin) {
       onNavigateToLogin();
     } else {
@@ -315,7 +315,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#92400E] to-[#D97706] flex items-center justify-center shadow-lg shadow-[#92400E]/20 mx-auto mb-3 border border-white/40">
             <UtensilsCrossed className="w-7 h-7 text-white" />
           </div>
-          <h2 className="text-2xl font-black text-[#1F2937] tracking-tight">ApexPOS</h2>
+          <h2 className="text-2xl font-black text-[#1F2937] tracking-tight">POS</h2>
           <p className="text-xs text-[#5B6470] mt-1 font-medium tracking-wide">
             Enterprise Password Recovery
           </p>
@@ -534,7 +534,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
                 </div>
                 <h3 className="text-xl font-bold text-[#1F2937] tracking-tight">Create New Password</h3>
                 <p className="text-xs text-[#5B6470] mt-1 leading-relaxed">
-                  Create a new secure password for your ApexPOS account.
+                  Create a new secure password for your POS account.
                 </p>
               </div>
 
@@ -677,7 +677,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
               </h3>
 
               <p className="text-xs text-[#5B6470] mt-2 leading-relaxed max-w-xs mx-auto">
-                Your ApexPOS password has been updated. You can now sign in using your new password.
+                Your POS password has been updated. You can now sign in using your new password.
               </p>
 
               <div className="mt-6 pt-4 border-t border-[#E5D8C6]">
@@ -697,7 +697,7 @@ export default function ForgotPasswordView({ initialStep = 'forgot', onNavigateT
           <div className="mt-6 pt-4 border-t border-[#E5D8C6] text-center">
             <div className="flex items-center justify-center gap-1.5 text-xs text-[#5B6470] font-medium">
               <ShieldCheck className="w-4 h-4 text-[#16A34A]" />
-              <span>ApexPOS Encrypted Auth Session</span>
+              <span>POS Encrypted Auth Session</span>
             </div>
           </div>
         </div>

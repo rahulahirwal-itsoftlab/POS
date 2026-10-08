@@ -92,6 +92,24 @@ export const updateOrderStatus = async (req, res, next) => {
   }
 };
 
+export const requestBill = async (req, res, next) => {
+  try {
+    const order = await orderService.requestBill(req.user.restaurantId, req.user.id, req.params.id);
+    return sendSuccess(res, 200, 'Bill request sent to Reception successfully', order);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelBillRequest = async (req, res, next) => {
+  try {
+    const order = await orderService.cancelBillRequest(req.user.restaurantId, req.params.id);
+    return sendSuccess(res, 200, 'Bill request cancelled successfully', order);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createOrder,
   getOrders,
@@ -100,6 +118,9 @@ export default {
   cancelOrder,
   getActiveOrders,
   addItemsToOrder,
+  requestBill,
+  cancelBillRequest,
   markServed,
+  sendToKitchen,
   updateOrderStatus,
 };

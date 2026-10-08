@@ -3,7 +3,7 @@ import { signToken } from './utils/jwt.js';
 
 async function runComprehensiveTests() {
   console.log('====================================================');
-  console.log('APEXPOS INVENTORY END-TO-END VERIFICATION SUITE');
+  console.log('POS INVENTORY END-TO-END VERIFICATION SUITE');
   console.log('====================================================\n');
 
   // 1. Get test restaurant and owner

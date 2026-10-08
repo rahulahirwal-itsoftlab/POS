@@ -13,7 +13,11 @@ export const env = {
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASSWORD: process.env.SMTP_PASSWORD || '',
   SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL || '',
-  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || 'ApexPOS',
+  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || 'POS',
+  RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID || '',
+  RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || '',
+  RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET || '',
+  RAZORPAY_CURRENCY: process.env.RAZORPAY_CURRENCY || 'INR',
 };
 
 // Singleton PrismaClient setup

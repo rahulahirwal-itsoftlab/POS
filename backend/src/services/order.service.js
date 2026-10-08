@@ -16,20 +16,28 @@ export const createOrder = async (restaurantId, waiterId, data) => {
         throw error;
       }
 
-      if (table.status !== 'AVAILABLE') {
-        // If table is occupied, check if there is an active open order for this table
-        const activeOrder = await tx.order.findFirst({
-          where: {
-            tableId: table.id,
-            restaurantId,
-            status: { notIn: ['COMPLETED', 'CANCELLED'] },
-          },
-        });
-        if (activeOrder) {
-          // Append items to the existing active order
-          return await addItemsToExistingOrder(tx, restaurantId, activeOrder.id, data.items, data.notes);
+      // Check if there is an active open order for this table FIRST
+      const activeOrder = await tx.order.findFirst({
+        where: {
+          tableId: table.id,
+          restaurantId,
+          status: { notIn: ['COMPLETED', 'CANCELLED'] },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (activeOrder) {
+        // Ensure table status reflects OCCUPIED
+        if (table.status !== 'OCCUPIED') {
+          await tx.table.update({
+            where: { id: table.id },
+            data: { status: 'OCCUPIED' },
+          });
         }
+        // Append items to the existing active order
+        return await addItemsToExistingOrder(tx, restaurantId, activeOrder.id, data.items, data.notes);
+      }
 
+      if (table.status !== 'AVAILABLE') {
         const error = new Error(`Table is not available (current status: '${table.status}')`);
         error.statusCode = 409;
         throw error;
@@ -231,7 +239,7 @@ export const cancelOrder = async (restaurantId, id) => {
 export const addItemsToExistingOrder = async (tx, restaurantId, orderId, items, additionalNotes) => {
   const order = await tx.order.findFirst({
     where: { id: orderId, restaurantId },
-    include: { items: true },
+    include: { items: true, bill: true },
   });
 
   if (!order) {
@@ -243,6 +251,12 @@ export const addItemsToExistingOrder = async (tx, restaurantId, orderId, items, 
   if (['COMPLETED', 'CANCELLED'].includes(order.status)) {
     const error = new Error(`Cannot add items to order in '${order.status}' status`);
     error.statusCode = 400;
+    throw error;
+  }
+
+  if (order.bill && order.bill.status !== 'VOID') {
+    const error = new Error('A bill has already been generated for this table. Please ask Reception to void or update the bill before adding new items.');
+    error.statusCode = 409;
     throw error;
   }
 
@@ -309,11 +323,14 @@ export const addItemsToExistingOrder = async (tx, restaurantId, orderId, items, 
     data: {
       status: nextStatus,
       notes: nextNotes,
+      billRequested: false,
+      billRequestedAt: null,
     },
     include: {
       table: true,
       waiter: { select: { id: true, name: true, role: true } },
       items: { include: { menuItem: true } },
+      bill: true,
     },
   });
 };
@@ -321,6 +338,90 @@ export const addItemsToExistingOrder = async (tx, restaurantId, orderId, items, 
 export const addItemsToOrder = async (restaurantId, waiterId, orderId, data) => {
   return await serializableTransaction(prisma, async (tx) => {
     return await addItemsToExistingOrder(tx, restaurantId, orderId, data.items || [], data.notes);
+  });
+};
+
+export const requestBill = async (restaurantId, waiterId, orderId) => {
+  return await serializableTransaction(prisma, async (tx) => {
+    const order = await tx.order.findFirst({
+      where: { id: orderId, restaurantId },
+      include: {
+        table: true,
+        items: { include: { menuItem: true } },
+        bill: true,
+      },
+    });
+
+    if (!order) {
+      const error = new Error('Order not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (['COMPLETED', 'CANCELLED'].includes(order.status)) {
+      const error = new Error(`Cannot request bill for order in '${order.status}' status`);
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!order.items || order.items.length === 0) {
+      const error = new Error('Cannot request bill for an empty order');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (order.bill && order.bill.status !== 'VOID') {
+      return order; // Bill already generated and active
+    }
+
+    return await tx.order.update({
+      where: { id: order.id },
+      data: {
+        billRequested: true,
+        billRequestedAt: new Date(),
+      },
+      include: {
+        table: true,
+        waiter: { select: { id: true, name: true, role: true } },
+        items: { include: { menuItem: true } },
+        bill: true,
+      },
+    });
+  });
+};
+
+export const cancelBillRequest = async (restaurantId, orderId) => {
+  return await serializableTransaction(prisma, async (tx) => {
+    const order = await tx.order.findFirst({
+      where: { id: orderId, restaurantId },
+      include: { bill: true },
+    });
+
+    if (!order) {
+      const error = new Error('Order not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (order.bill && order.bill.status !== 'VOID') {
+      const error = new Error('Bill has already been generated by Reception. Ask Reception to void the bill.');
+      error.statusCode = 409;
+      throw error;
+    }
+
+    return await tx.order.update({
+      where: { id: order.id },
+      data: {
+        billRequested: false,
+        billRequestedAt: null,
+      },
+      include: {
+        table: true,
+        waiter: { select: { id: true, name: true, role: true } },
+        items: { include: { menuItem: true } },
+        bill: true,
+      },
+    });
   });
 };
 
@@ -402,6 +503,8 @@ export default {
   updateOrder,
   cancelOrder,
   addItemsToOrder,
+  requestBill,
+  cancelBillRequest,
   markServed,
   updateOrderStatus,
 };

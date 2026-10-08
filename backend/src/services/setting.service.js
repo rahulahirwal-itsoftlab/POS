@@ -4,9 +4,9 @@ import { prisma } from '../config/env.js';
 export const DEFAULT_SETTINGS = {
   PLATFORM: {
     platform_general: {
-      platformName: 'ApexPOS Enterprise Cloud',
-      supportEmail: 'support@apexpos.com',
-      supportPhone: '+1 (800) 555-APEX',
+      platformName: 'POS Enterprise Cloud',
+      supportEmail: 'support@pos.com',
+      supportPhone: '+1 (800) 555-POS',
       maintenanceMode: false,
       allowNewRegistrations: true,
       defaultPlanDurationDays: 365,

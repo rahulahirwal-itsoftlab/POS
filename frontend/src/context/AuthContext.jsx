@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api, getAuthToken, setAuthToken, getActiveUser, setActiveUser } from '../services/api';
 import posService from '../services/pos.service';
+import { normalizeRole, getDefaultPathForRole } from '../config/navigation';
 
 const AuthContext = createContext();
 
@@ -29,6 +30,9 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       const storedToken = getAuthToken();
       if (!storedToken) {
+        setUser(null);
+        setActiveUser(null);
+        setRestaurant(null);
         setLoading(false);
         return;
       }
@@ -65,13 +69,21 @@ export const AuthProvider = ({ children }) => {
       const res = await posService.auth.login({ email, password });
       if (res.success && res.data) {
         const { token: receivedToken, user: loggedUser, restaurant: loggedRestaurant } = res.data;
+        const normalizedRole = normalizeRole(loggedUser.role);
+        const defaultPath = getDefaultPathForRole(normalizedRole);
+
         setAuthToken(receivedToken);
         setTokenState(receivedToken);
         setUser(loggedUser);
         setActiveUser(loggedUser);
         setRestaurant(loggedRestaurant || loggedUser.restaurant || null);
         addToast(`Welcome back, ${loggedUser.name}!`, 'success');
-        return { success: true, user: loggedUser };
+        return {
+          success: true,
+          user: loggedUser,
+          role: normalizedRole,
+          defaultPath,
+        };
       }
       throw new Error(res.message || 'Login failed');
     } catch (err) {
@@ -85,13 +97,21 @@ export const AuthProvider = ({ children }) => {
       const res = await posService.auth.register(payload);
       if (res.success && res.data) {
         const { token: receivedToken, user: registeredUser, restaurant: regRestaurant } = res.data;
+        const normalizedRole = normalizeRole(registeredUser.role);
+        const defaultPath = getDefaultPathForRole(normalizedRole);
+
         setAuthToken(receivedToken);
         setTokenState(receivedToken);
         setUser(registeredUser);
         setActiveUser(registeredUser);
         setRestaurant(regRestaurant || null);
         addToast('Restaurant & Owner account registered successfully!', 'success');
-        return { success: true };
+        return {
+          success: true,
+          user: registeredUser,
+          role: normalizedRole,
+          defaultPath,
+        };
       }
       throw new Error(res.message || 'Registration failed');
     } catch (err) {
@@ -106,6 +126,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setActiveUser(null);
     setRestaurant(null);
+    if (window.location.pathname !== '/login') {
+      window.history.replaceState(null, '', '/login');
+    }
   };
 
   const updateUserData = (updatedFields) => {
@@ -116,11 +139,13 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const normalizedRole = normalizeRole(user?.role);
+
   return (
     <AuthContext.Provider
       value={{
         user,
-        role: user?.role || 'GUEST',
+        role: normalizedRole,
         restaurant,
         token,
         loading,

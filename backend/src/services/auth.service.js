@@ -212,7 +212,7 @@ export const changePassword = async (userId, { currentPassword, newPassword }) =
 const hashOtp = (email, otp) => {
   return crypto
     .createHash('sha256')
-    .update(`${email.trim().toLowerCase()}:${otp.trim()}:${env.JWT_SECRET || 'apexpos_secure_salt'}`)
+    .update(`${email.trim().toLowerCase()}:${otp.trim()}:${env.JWT_SECRET || 'pos_secure_salt'}`)
     .digest('hex');
 };
 
@@ -222,7 +222,7 @@ const hashOtp = (email, otp) => {
 const hashResetToken = (token) => {
   return crypto
     .createHash('sha256')
-    .update(`${token.trim()}:${env.JWT_SECRET || 'apexpos_secure_salt'}`)
+    .update(`${token.trim()}:${env.JWT_SECRET || 'pos_secure_salt'}`)
     .digest('hex');
 };
 

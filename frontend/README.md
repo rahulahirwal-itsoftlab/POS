@@ -1,4 +1,4 @@
-# ApexPOS — Enterprise Restaurant Point of Sale Frontend
+# POS — Enterprise Restaurant Point of Sale Frontend
 
 Modern, high-performance, dark-themed Restaurant POS and Operations Web Application built with **React**, **Vite**, **Tailwind CSS**, and **Lucide Icons**, designed to consume all 103 endpoints and business flows of the Enterprise Restaurant POS Express/Prisma/PostgreSQL backend.
 

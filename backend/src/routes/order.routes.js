@@ -19,6 +19,8 @@ router.get('/', orderController.getOrders);
 router.get('/:id', orderController.getOrderById);
 router.post('/', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER, ROLES.RECEPTIONIST), validateRequest(validateCreateOrder), orderController.createOrder);
 router.post('/:id/items', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), orderController.addItemsToOrder);
+router.post('/:id/request-bill', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), orderController.requestBill);
+router.post('/:id/cancel-bill-request', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER, ROLES.RECEPTIONIST), orderController.cancelBillRequest);
 router.post('/:id/send-to-kitchen', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER), orderController.sendToKitchen);
 router.patch('/:id/served', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER, ROLES.KITCHEN_ADMIN), orderController.markServed);
 router.post('/:id/serve', authorizeRoles(ROLES.WAITER, ROLES.RESTAURANT_OWNER, ROLES.KITCHEN_ADMIN), orderController.markServed);

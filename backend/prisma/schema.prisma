@@ -53,6 +53,7 @@ enum PaymentMethod {
   UPI
   NET_BANKING
   OTHER
+  RAZORPAY
 }
 
 enum PaymentStatus {
@@ -225,6 +226,7 @@ model MenuItem {
   description  String?
   price        Decimal       @db.Decimal(10, 2)
   isAvailable  Boolean       @default(true)
+  dietary      String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -352,6 +354,8 @@ model Order {
   servedById        String?
   servedBy          User?                  @relation("OrdersServed", fields: [servedById], references: [id], onDelete: SetNull)
   inventoryDeducted Boolean                @default(false)
+  billRequested     Boolean                @default(false) @map("bill_requested")
+  billRequestedAt   DateTime?              @map("bill_requested_at")
   createdAt         DateTime               @default(now())
   updatedAt         DateTime               @updatedAt
 
@@ -414,6 +418,10 @@ model Payment {
   method               PaymentMethod @default(CASH)
   status               PaymentStatus @default(COMPLETED)
   transactionReference String?
+  provider             String?
+  razorpayOrderId      String?
+  razorpayPaymentId    String?
+  razorpaySignature    String?
   createdAt            DateTime      @default(now())
 
   @@map("payments")

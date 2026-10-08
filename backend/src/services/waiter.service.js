@@ -130,7 +130,16 @@ export const getWaiterDashboard = async (restaurantId, waiterId) => {
     let action = 'NEW_ORDER';
 
     if (currentOrder) {
-      if (currentOrder.status === 'READY') {
+      if (currentOrder.bill && !currentOrder.bill.isDelivered) {
+        operationalStatus = 'BILL_READY';
+        action = 'DELIVER_BILL';
+      } else if (currentOrder.bill && currentOrder.bill.status === 'PAID') {
+        operationalStatus = 'COMPLETED';
+        action = 'AVAILABLE';
+      } else if (currentOrder.billRequested) {
+        operationalStatus = 'BILL_REQUESTED';
+        action = 'WAIT_BILL';
+      } else if (currentOrder.status === 'READY') {
         operationalStatus = 'READY';
         action = 'SERVE';
       } else if (['ACCEPTED', 'IN_PREPARATION'].includes(currentOrder.status)) {
@@ -140,16 +149,8 @@ export const getWaiterDashboard = async (restaurantId, waiterId) => {
         operationalStatus = 'ORDERING';
         action = 'ADD_ITEMS';
       } else if (currentOrder.status === 'SERVED') {
-        if (currentOrder.bill && !currentOrder.bill.isDelivered) {
-          operationalStatus = 'BILLING';
-          action = 'DELIVER_BILL';
-        } else if (currentOrder.bill && currentOrder.bill.status === 'PAID') {
-          operationalStatus = 'COMPLETED';
-          action = 'AVAILABLE';
-        } else {
-          operationalStatus = 'SERVED';
-          action = 'VIEW_BILL';
-        }
+        operationalStatus = 'SERVED';
+        action = 'REQUEST_BILL';
       }
     } else {
       operationalStatus = t.status;
@@ -170,6 +171,8 @@ export const getWaiterDashboard = async (restaurantId, waiterId) => {
             id: currentOrder.id,
             orderNumber: currentOrder.orderNumber,
             status: currentOrder.status,
+            billRequested: Boolean(currentOrder.billRequested),
+            billRequestedAt: currentOrder.billRequestedAt,
             customerName: currentOrder.customerName,
             notes: currentOrder.notes,
             itemsCount: currentOrder.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,

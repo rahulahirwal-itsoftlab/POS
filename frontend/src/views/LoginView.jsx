@@ -20,7 +20,7 @@ import {
 
 import restaurantHero from '../assets/restaurant_hero.jpg';
 
-export default function LoginView({ onNavigateToForgotPassword }) {
+export default function LoginView({ onNavigateToForgotPassword, onLoginSuccess }) {
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +46,10 @@ export default function LoginView({ onNavigateToForgotPassword }) {
 
     setLoading(true);
     try {
-      await login(email.trim(), password);
+      const authResult = await login(email.trim(), password);
+      if (onLoginSuccess && authResult?.defaultPath) {
+        onLoginSuccess(authResult);
+      }
     } catch (err) {
       setErrorMsg(err.message || 'Invalid email or password. Please verify credentials.');
     } finally {
@@ -102,7 +105,7 @@ export default function LoginView({ onNavigateToForgotPassword }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-black tracking-tight text-white font-sans">ApexPOS</span>
+                <span className="text-2xl font-black tracking-tight text-white font-sans">POS</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-white/15 text-[#FDE68A] px-2.5 py-0.5 rounded-full border border-white/20 backdrop-blur-md">
                   v2.4
                 </span>
@@ -178,7 +181,7 @@ export default function LoginView({ onNavigateToForgotPassword }) {
         {/* Subtle Decorative Botanical & Organic Ambient Shapes */}
         <div className="absolute top-10 right-10 w-72 h-72 bg-[#E7DCCB]/50 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 left-10 w-80 h-80 bg-[#D97706]/10 rounded-full blur-3xl pointer-events-none" />
-        
+
         {/* Subtle decorative leaf accent outline in background */}
         <svg
           className="absolute -bottom-8 -right-8 w-64 h-64 text-[#E5D8C6]/40 pointer-events-none select-none"
@@ -205,7 +208,7 @@ export default function LoginView({ onNavigateToForgotPassword }) {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#92400E] to-[#D97706] flex items-center justify-center shadow-lg shadow-[#92400E]/20 mx-auto mb-3">
               <UtensilsCrossed className="w-7 h-7 text-white" />
             </div>
-            <h2 className="text-2xl font-black text-[#1F2937] tracking-tight">ApexPOS</h2>
+            <h2 className="text-2xl font-black text-[#1F2937] tracking-tight">POS</h2>
             <p className="text-xs text-[#5B6470] mt-1 font-medium">
               Enterprise Restaurant Point-of-Sale System
             </p>

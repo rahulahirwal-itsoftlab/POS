@@ -24,14 +24,35 @@ export const generateBill = async (restaurantId, receptionistId, data) => {
       throw error;
     }
 
-    if (!['SERVED', 'COMPLETED', 'READY'].includes(order.status)) {
-      const error = new Error('Order must be prepared and served before a bill can be generated');
+    if (!['SERVED', 'COMPLETED', 'READY'].includes(order.status) && !order.billRequested) {
+      const error = new Error('Order must be prepared and served, or have bill requested by waiter, before a bill can be generated');
       error.statusCode = 422;
       throw error;
     }
 
-    if (order.bill) {
+    if (order.bill && order.bill.status !== 'VOID') {
       return order.bill;
+    }
+
+    // Ensure order is marked SERVED and all items are SERVED once bill is being created
+    if (order.status !== 'SERVED' && order.status !== 'COMPLETED') {
+      await tx.order.update({
+        where: { id: order.id },
+        data: {
+          status: 'SERVED',
+          servedAt: new Date(),
+          billRequested: false,
+        },
+      });
+      await tx.orderItem.updateMany({
+        where: { orderId: order.id, status: { not: 'SERVED' } },
+        data: { status: 'SERVED' },
+      });
+    } else if (order.billRequested) {
+      await tx.order.update({
+        where: { id: order.id },
+        data: { billRequested: false },
+      });
     }
 
     // Calculate subtotal from order items
@@ -77,7 +98,7 @@ export const getBillById = async (restaurantId, id) => {
     where: { id, restaurantId },
     include: {
       order: { include: { items: { include: { menuItem: true } }, table: true } },
-      payments: true,
+      payments: { orderBy: { createdAt: 'desc' } },
       receptionist: { select: { id: true, name: true } },
     },
   });
@@ -86,7 +107,7 @@ export const getBillById = async (restaurantId, id) => {
     error.statusCode = 404;
     throw error;
   }
-  return bill;
+  return { ...bill, paymentStatus: bill.status };
 };
 
 export const getBillByOrderId = async (restaurantId, orderId) => {
@@ -94,7 +115,7 @@ export const getBillByOrderId = async (restaurantId, orderId) => {
     where: { orderId, restaurantId },
     include: {
       order: { include: { items: { include: { menuItem: true } }, table: true } },
-      payments: true,
+      payments: { orderBy: { createdAt: 'desc' } },
       receptionist: { select: { id: true, name: true } },
     },
   });
@@ -103,14 +124,14 @@ export const getBillByOrderId = async (restaurantId, orderId) => {
     error.statusCode = 404;
     throw error;
   }
-  return bill;
+  return { ...bill, paymentStatus: bill.status };
 };
 
 export const getAllBills = async (restaurantId, status = null, filters = {}) => {
   const where = { restaurantId };
   if (status) where.status = status;
 
-  return await findManyPaginated(prisma.bill, {
+  const result = await findManyPaginated(prisma.bill, {
     where,
     include: {
       order: {
@@ -123,11 +144,18 @@ export const getAllBills = async (restaurantId, status = null, filters = {}) => 
           },
         },
       },
-      payments: true,
+      payments: { orderBy: { createdAt: 'desc' } },
       receptionist: { select: { id: true, name: true } },
     },
     orderBy: { createdAt: 'desc' },
   }, filters);
+
+  result.items = result.items.map((b) => ({
+    ...b,
+    paymentStatus: b.status,
+  }));
+
+  return result;
 };
 
 export const getBills = async (restaurantId, status = null, filters = {}) => {
@@ -172,14 +200,21 @@ export const getPendingBillingOrders = async (restaurantId, filters = {}) => {
     {
       where: {
         restaurantId,
-        status: { in: ['READY', 'SERVED', 'COMPLETED'] },
         bill: null,
+        OR: [
+          { billRequested: true, status: { notIn: ['CANCELLED', 'COMPLETED'] } },
+          { status: { in: ['READY', 'SERVED', 'COMPLETED'] } },
+        ],
       },
       include: {
         table: true,
+        waiter: { select: { id: true, name: true } },
         items: { include: { menuItem: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [
+        { billRequested: 'desc' },
+        { createdAt: 'desc' },
+      ],
     },
     filters
   );

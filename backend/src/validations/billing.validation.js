@@ -13,7 +13,7 @@ export const validateGenerateBill = (data) => {
 
 export const validatePayment = (data) => {
   const errors = [];
-  const validMethods = ['CASH', 'CARD', 'UPI', 'NET_BANKING', 'OTHER'];
+  const validMethods = ['CASH', 'CARD', 'UPI', 'NET_BANKING', 'OTHER', 'RAZORPAY'];
   if (!isUuid(data?.billId)) {
     errors.push('billId must be a UUID');
   }
@@ -28,7 +28,34 @@ export const validatePayment = (data) => {
   return { isValid: errors.length === 0, errors };
 };
 
+export const validateRazorpayOrder = (data) => {
+  const errors = [];
+  if (!isUuid(data?.billId)) {
+    errors.push('billId must be a valid UUID');
+  }
+  return { isValid: errors.length === 0, errors };
+};
+
+export const validateRazorpayVerify = (data) => {
+  const errors = [];
+  if (!isUuid(data?.billId)) {
+    errors.push('billId must be a valid UUID');
+  }
+  if (!data?.razorpayOrderId || typeof data.razorpayOrderId !== 'string') {
+    errors.push('razorpayOrderId is required');
+  }
+  if (!data?.razorpayPaymentId || typeof data.razorpayPaymentId !== 'string') {
+    errors.push('razorpayPaymentId is required');
+  }
+  if (!data?.razorpaySignature || typeof data.razorpaySignature !== 'string') {
+    errors.push('razorpaySignature is required');
+  }
+  return { isValid: errors.length === 0, errors };
+};
+
 export default {
   validateGenerateBill,
   validatePayment,
+  validateRazorpayOrder,
+  validateRazorpayVerify,
 };

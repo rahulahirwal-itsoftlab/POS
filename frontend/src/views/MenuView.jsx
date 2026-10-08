@@ -40,7 +40,7 @@ export default function MenuView() {
     description: '',
     price: '',
     categoryId: '',
-    isVeg: true,
+    dietary: '',
     isAvailable: true,
     preparationTime: 15,
   });
@@ -121,13 +121,18 @@ export default function MenuView() {
       addToast('Please fill in dish name, price and category', 'warning');
       return;
     }
+    if (!itemForm.dietary) {
+      addToast('Please select a dietary type.', 'warning');
+      return;
+    }
     try {
       const payload = {
         name: itemForm.name.trim(),
         description: itemForm.description.trim() || undefined,
         price: Number(itemForm.price),
         categoryId: itemForm.categoryId,
-        isVeg: Boolean(itemForm.isVeg),
+        dietary: itemForm.dietary,
+        isVeg: itemForm.dietary === 'VEG' || itemForm.dietary === 'JAIN',
         isAvailable: Boolean(itemForm.isAvailable),
         preparationTime: Number(itemForm.preparationTime) || 15,
       };
@@ -256,7 +261,7 @@ export default function MenuView() {
                 description: '',
                 price: '',
                 categoryId: categories[0]?.id || '',
-                isVeg: true,
+                dietary: '',
                 isAvailable: true,
                 preparationTime: 15,
               });
@@ -360,15 +365,35 @@ export default function MenuView() {
                         {cat?.name || 'Unassigned'}
                       </td>
                       <td className="px-5 py-4">
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
-                            itm.isVeg
-                              ? 'bg-emerald-50 text-[#16A34A] border-emerald-200'
-                              : 'bg-rose-50 text-[#EF4444] border-rose-200'
-                          }`}
-                        >
-                          {itm.isVeg ? 'Vegetarian' : 'Non-Veg'}
-                        </span>
+                        {itm.dietary === 'VEG' ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-emerald-50 text-[#16A34A] border-emerald-200">
+                            VEG
+                          </span>
+                        ) : itm.dietary === 'NON-VEG' || itm.dietary === 'NON_VEG' ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-rose-50 text-[#EF4444] border-rose-200">
+                            NON-VEG
+                          </span>
+                        ) : itm.dietary === 'JAIN' ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-amber-50 text-[#D97706] border-amber-200">
+                            JAIN
+                          </span>
+                        ) : itm.dietary === 'EGG' ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase border bg-amber-50 text-amber-800 border-amber-300">
+                            EGG
+                          </span>
+                        ) : itm.isVeg !== undefined ? (
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                              itm.isVeg
+                                ? 'bg-emerald-50 text-[#16A34A] border-emerald-200'
+                                : 'bg-rose-50 text-[#EF4444] border-rose-200'
+                            }`}
+                          >
+                            {itm.isVeg ? 'VEG' : 'NON-VEG'}
+                          </span>
+                        ) : (
+                          <span className="text-[11px] text-[#5B6470] italic">Unassigned</span>
+                        )}
                       </td>
                       <td className="px-5 py-4 font-mono font-bold text-[#1F2937] text-sm">
                         {currency}{Number(itm.price).toFixed(2)}
@@ -415,7 +440,7 @@ export default function MenuView() {
                               description: itm.description || '',
                               price: itm.price,
                               categoryId: itm.categoryId,
-                              isVeg: itm.isVeg,
+                              dietary: itm.dietary || (itm.isVeg !== undefined ? (itm.isVeg ? 'VEG' : 'NON-VEG') : ''),
                               isAvailable: itm.isAvailable,
                               preparationTime: itm.preparationTime || 15,
                             });
@@ -528,31 +553,21 @@ export default function MenuView() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">Dietary Preference</label>
-                  <div className="flex gap-2 mt-1">
-                    <button
-                      type="button"
-                      onClick={() => setItemForm({ ...itemForm, isVeg: true })}
-                      className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
-                        itemForm.isVeg
-                          ? 'bg-[#16A34A] text-white border-[#16A34A]'
-                          : 'bg-[#FAF7F2] text-[#5B6470] border-[#E5D8C6]'
-                      }`}
-                    >
-                      Veg
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setItemForm({ ...itemForm, isVeg: false })}
-                      className={`flex-1 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
-                        !itemForm.isVeg
-                          ? 'bg-[#EF4444] text-white border-[#EF4444]'
-                          : 'bg-[#FAF7F2] text-[#5B6470] border-[#E5D8C6]'
-                      }`}
-                    >
-                      Non-Veg
-                    </button>
-                  </div>
+                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">
+                    Dietary Type *
+                  </label>
+                  <select
+                    required
+                    value={itemForm.dietary}
+                    onChange={(e) => setItemForm({ ...itemForm, dietary: e.target.value })}
+                    className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3 py-2 text-sm text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
+                  >
+                    <option value="">Select Dietary Type</option>
+                    <option value="VEG">VEG</option>
+                    <option value="NON-VEG">NON-VEG</option>
+                    <option value="JAIN">JAIN</option>
+                    <option value="EGG">EGG</option>
+                  </select>
                 </div>
               </div>
 

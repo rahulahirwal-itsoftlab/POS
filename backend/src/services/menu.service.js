@@ -125,6 +125,7 @@ export const createMenuItem = async (restaurantId, data) => {
       description: data.description || null,
       price: Number(data.price),
       isAvailable: data.isAvailable !== undefined ? data.isAvailable : true,
+      dietary: data.dietary || null,
     },
     include: {
       category: true,
@@ -142,6 +143,7 @@ export const createMenuItem = async (restaurantId, data) => {
 export const getMenuItems = async (restaurantId, filters = {}) => {
   const where = { restaurantId };
   if (filters.categoryId) where.categoryId = filters.categoryId;
+  if (filters.dietary) where.dietary = filters.dietary;
   if (filters.isAvailable !== undefined) {
     where.isAvailable = filters.isAvailable === 'true' || filters.isAvailable === true;
   }
@@ -204,6 +206,7 @@ export const updateMenuItem = async (restaurantId, id, data) => {
       price: data.price !== undefined ? Number(data.price) : undefined,
       categoryId: data.categoryId !== undefined ? data.categoryId : undefined,
       isAvailable: data.isAvailable !== undefined ? data.isAvailable : undefined,
+      dietary: data.dietary !== undefined ? (data.dietary || null) : undefined,
     },
     include: {
       category: true,

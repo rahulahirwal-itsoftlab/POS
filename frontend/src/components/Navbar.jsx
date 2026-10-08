@@ -40,15 +40,24 @@ export default function Navbar({
     return () => clearInterval(timer);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
       }
     };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setDropdownOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const roleBadges = {
@@ -128,29 +137,39 @@ export default function Navbar({
         </button>
 
         {/* Brand Icon & Name */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#92400E] to-[#D97706] flex items-center justify-center shadow-md shadow-[#92400E]/20 shrink-0">
             <UtensilsCrossed className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-[#1F2937] text-lg tracking-tight">ApexPOS</span>
-              {role === 'RESTAURANT_REGISTRATION_ADMIN' ? (
-                <span className="text-[11px] bg-[#92400E]/10 text-[#92400E] font-bold px-2 py-0.5 rounded-full border border-[#92400E]/20">
-                  Platform SaaS
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="font-bold text-[#1F2937] text-lg tracking-tight shrink-0">POS</span>
+            {role === 'RESTAURANT_REGISTRATION_ADMIN' ? (
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-[#E5D8C6] shrink-0" />
+                <span className="text-xs sm:text-sm font-semibold text-[#5B6470] truncate max-w-[120px] sm:max-w-none">
+                  Platform Super Admin
                 </span>
-              ) : planName ? (
-                <span className="text-[11px] bg-[#D97706]/10 text-[#92400E] font-bold px-2 py-0.5 rounded-full border border-[#D97706]/25 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-[#D97706]" />
-                  <span>{planName}</span>
+                <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-[#92400E]/10 text-[#92400E] border border-[#92400E]/25 shrink-0 shadow-xs">
+                  SUPER ADMIN
                 </span>
-              ) : null}
-            </div>
-            <p className="text-xs text-[#5B6470] font-medium truncate max-w-xs sm:max-w-md hidden sm:block">
-              {role === 'RESTAURANT_REGISTRATION_ADMIN'
-                ? 'Multi-Tenant Governance & Plan Control'
-                : restaurant?.name || 'Restaurant Management System'}
-            </p>
+              </div>
+            ) : (
+              <div className="flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-2">
+                  {restaurant?.name && (
+                    <span className="text-xs sm:text-sm font-semibold text-[#5B6470] truncate max-w-[140px] sm:max-w-xs">
+                      {restaurant.name}
+                    </span>
+                  )}
+                  {planName && (
+                    <span className="text-[10px] sm:text-[11px] bg-[#D97706]/10 text-[#92400E] font-bold px-2 py-0.5 rounded-full border border-[#D97706]/25 flex items-center gap-1 shrink-0">
+                      <Sparkles className="w-3 h-3 text-[#D97706]" />
+                      <span>{planName}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -177,14 +196,14 @@ export default function Navbar({
         </button>
 
         {/* User Card with Interactive Profile Dropdown */}
-        <div className="relative pl-2 sm:pl-3 border-l border-[#E5D8C6]" ref={dropdownRef}>
+        <div className="relative pl-2 sm:pl-3 border-l border-[#E5D8C6] shrink-0" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="flex items-center gap-2.5 sm:gap-3 p-1.5 rounded-xl hover:bg-[#F1E8DB] transition-colors cursor-pointer text-left"
+            className="flex items-center gap-2 sm:gap-2.5 p-1.5 rounded-xl hover:bg-[#F1E8DB] transition-colors cursor-pointer text-left shrink-0"
             title="Account Menu"
           >
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-semibold text-[#1F2937] leading-tight">{user?.name || 'Staff User'}</div>
+              <div className="text-sm font-semibold text-[#1F2937] leading-tight truncate max-w-[130px] lg:max-w-none">{user?.name || 'Staff User'}</div>
               <div className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border inline-block mt-0.5 ${currentBadge.color}`}>
                 {currentBadge.label}
               </div>
@@ -192,7 +211,7 @@ export default function Navbar({
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#E7DCCB] border border-[#E5D8C6] flex items-center justify-center font-bold text-[#92400E] text-sm shadow-sm shrink-0">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-[#5B6470] hidden sm:block" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#5B6470] hidden sm:block shrink-0" />
           </button>
 
           {/* Floating Dropdown Menu */}
@@ -214,7 +233,7 @@ export default function Navbar({
                 </div>
               </div>
 
-              {/* Menu Items */}
+              {/* Menu Items: Exactly 2 role-independent items */}
               <div className="space-y-1">
                 {/* 1. My Profile & Account */}
                 <button
@@ -225,27 +244,9 @@ export default function Navbar({
                   <span>My Profile & Account</span>
                 </button>
 
-                {/* 2. Security & Password */}
-                <button
-                  onClick={() => handleNavigate('security')}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1F2937] hover:bg-[#F1E8DB] transition-colors text-left cursor-pointer"
-                >
-                  <Shield className="w-4 h-4 text-[#2563EB]" />
-                  <span>Security & Password</span>
-                </button>
-
-                {/* 3. Role Settings Shortcut */}
-                <button
-                  onClick={() => handleNavigate(currentBadge.settingsSubTab)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#1F2937] hover:bg-[#F1E8DB] transition-colors text-left cursor-pointer"
-                >
-                  <Sliders className="w-4 h-4 text-[#D97706]" />
-                  <span>{currentBadge.settingsLabel}</span>
-                </button>
-
                 <div className="h-px bg-[#E5D8C6] my-1" />
 
-                {/* 4. Sign Out */}
+                {/* 2. Sign Out */}
                 <button
                   onClick={() => {
                     setDropdownOpen(false);

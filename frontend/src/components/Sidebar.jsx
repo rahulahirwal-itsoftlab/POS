@@ -67,6 +67,11 @@ export default function Sidebar({
           icon: UtensilsCrossed,
         },
         {
+          id: 'tables',
+          label: 'Table Management',
+          icon: LayoutGrid,
+        },
+        {
           id: 'inventory',
           label: 'Inventory',
           icon: Boxes,
@@ -90,7 +95,6 @@ export default function Sidebar({
         { id: 'tables', label: 'Tables', icon: LayoutGrid },
         { id: 'orders', label: 'Orders', icon: ClipboardList },
         { id: 'menu', label: 'Menu', icon: UtensilsCrossed },
-        { id: 'bills', label: 'Bills', icon: Receipt },
         { id: 'settings', label: 'Settings', icon: Settings },
       ];
     }
@@ -165,28 +169,30 @@ export default function Sidebar({
                 key={item.id}
                 onClick={() => handleItemClick(item.id)}
                 title={isIconOnly ? item.label : undefined}
-                className={`w-full flex items-center rounded-xl font-medium text-sm transition-all duration-200 group cursor-pointer ${
-                  isIconOnly ? 'justify-center p-3' : 'justify-between px-3 py-2.5'
+                className={`w-full flex items-center rounded-xl font-semibold text-sm transition-all duration-200 group cursor-pointer relative ${
+                  isIconOnly ? 'justify-center p-3' : 'justify-between px-3.5 py-2.5'
                 } ${
                   isActive
-                    ? 'bg-[#92400E] text-[#FFFFFF] shadow-sm font-semibold'
-                    : 'text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB]'
+                    ? 'bg-[#92400E] text-white shadow-sandstone font-bold'
+                    : 'text-[#5B6470] hover:text-[#1F2937] hover:bg-[#FAF7F2]'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <Icon
-                    className={`w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
-                      isActive ? 'text-[#FFFFFF]' : 'text-[#6B6258] group-hover:text-[#92400E]'
+                    className={`w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                      isActive ? 'text-white' : 'text-[#6B6258] group-hover:text-[#92400E]'
                     }`}
                   />
-                  {!isIconOnly && <span className="truncate">{item.label}</span>}
+                  {!isIconOnly && <span className="truncate whitespace-nowrap">{item.label}</span>}
                 </div>
                 {!isIconOnly && item.badge && (
-                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${
-                    isActive
-                      ? 'bg-[#78350F] text-[#FDE68A] border border-[#B45309]'
-                      : 'bg-[#D97706]/15 text-[#92400E] border border-[#D97706]/25'
-                  }`}>
+                  <span
+                    className={`text-[9.5px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ml-2 tracking-wider whitespace-nowrap ${
+                      isActive
+                        ? 'bg-[#78350F] text-[#FDE68A] border border-[#B45309]'
+                        : 'bg-[#D97706]/10 text-[#92400E] border border-[#D97706]/20'
+                    }`}
+                  >
                     {item.badge}
                   </span>
                 )}
@@ -245,7 +251,11 @@ export default function Sidebar({
       {/* Desktop Sidebar Container */}
       <aside
         className={`hidden lg:flex flex-col bg-white border-r border-[#E5D8C6] shrink-0 transition-all duration-300 ease-in-out shadow-[1px_0_3px_0_rgba(41,35,31,0.02)] ${
-          collapsed ? 'w-20' : 'w-64'
+          collapsed
+            ? 'w-20'
+            : role === 'RESTAURANT_REGISTRATION_ADMIN'
+            ? 'w-72'
+            : 'w-64'
         }`}
       >
         {renderNavContent(false)}

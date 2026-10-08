@@ -37,12 +37,53 @@ export const getPaymentsByBill = async (req, res, next) => {
   }
 };
 
+export const createRazorpayOrder = async (req, res, next) => {
+  try {
+    const result = await paymentService.createRazorpayOrder(req.user.restaurantId, req.body.billId);
+    return sendSuccess(res, 200, 'Razorpay order created successfully', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createRazorpayQrCode = async (req, res, next) => {
+  try {
+    const result = await paymentService.createRazorpayQrCode(req.user.restaurantId, req.body.billId);
+    return sendSuccess(res, 200, 'Razorpay QR code created successfully', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyRazorpayPayment = async (req, res, next) => {
+  try {
+    const result = await paymentService.verifyRazorpayPayment(req.user.restaurantId, req.body);
+    return sendSuccess(res, 200, 'Razorpay payment verified and processed successfully', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const handleRazorpayWebhook = async (req, res, next) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const result = await paymentService.handleRazorpayWebhook(req.body, signature);
+    return res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const processPayment = createPayment;
 export const getPaymentsByBillId = getPaymentsByBill;
 
 export default {
   createPayment,
   processPayment,
+  createRazorpayOrder,
+  createRazorpayQrCode,
+  verifyRazorpayPayment,
+  handleRazorpayWebhook,
   getPayments,
   getPaymentById,
   getPaymentsByBill,

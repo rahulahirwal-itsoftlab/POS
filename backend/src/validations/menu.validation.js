@@ -21,6 +21,8 @@ export const validateUpdateCategory = (data) => {
   return { isValid: errors.length === 0, errors };
 };
 
+const supportedDietary = ['VEG', 'NON-VEG', 'JAIN', 'EGG', 'NON_VEG'];
+
 export const validateCreateMenuItem = (data) => {
   const errors = [];
   if (!data?.name || typeof data.name !== 'string' || !data.name.trim()) {
@@ -31,6 +33,9 @@ export const validateCreateMenuItem = (data) => {
   }
   if (data?.categoryId !== undefined && data.categoryId !== null && !isUuid(data.categoryId)) errors.push('categoryId must be a UUID');
   if (data?.isAvailable !== undefined && typeof data.isAvailable !== 'boolean') errors.push('isAvailable must be a boolean');
+  if (data?.dietary !== undefined && data.dietary !== null && !supportedDietary.includes(data.dietary)) {
+    errors.push(`dietary must be one of ${supportedDietary.join(', ')}`);
+  }
   return { isValid: errors.length === 0, errors };
 };
 
@@ -44,7 +49,10 @@ export const validateUpdateMenuItem = (data) => {
   }
   if (data?.categoryId !== undefined && data.categoryId !== null && !isUuid(data.categoryId)) errors.push('categoryId must be a UUID');
   if (data?.isAvailable !== undefined && typeof data.isAvailable !== 'boolean') errors.push('isAvailable must be a boolean');
-  if (!Object.keys(data || {}).some((key) => ['name', 'description', 'price', 'categoryId', 'isAvailable'].includes(key))) errors.push('At least one supported field is required');
+  if (data?.dietary !== undefined && data.dietary !== null && !supportedDietary.includes(data.dietary)) {
+    errors.push(`dietary must be one of ${supportedDietary.join(', ')}`);
+  }
+  if (!Object.keys(data || {}).some((key) => ['name', 'description', 'price', 'categoryId', 'isAvailable', 'dietary'].includes(key))) errors.push('At least one supported field is required');
   return { isValid: errors.length === 0, errors };
 };
 

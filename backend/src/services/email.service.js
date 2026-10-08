@@ -62,7 +62,7 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ApexPOS Password Reset</title>
+  <title>POS Password Reset</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #FAF7F2; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
   <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #FAF7F2; padding: 40px 16px;">
@@ -81,7 +81,7 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
                   </td>
                 </tr>
               </table>
-              <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1F2937; letter-spacing: -0.5px;">ApexPOS</h1>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #1F2937; letter-spacing: -0.5px;">POS</h1>
               <p style="margin: 4px 0 0 0; font-size: 12px; color: #5B6470; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Restaurant Management System</p>
             </td>
           </tr>
@@ -94,7 +94,7 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
                 Hello <strong>${recipientName}</strong>,
               </p>
               <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #4B5563;">
-                We received a request to reset your ApexPOS account password. Use the single-use verification code below to proceed:
+                We received a request to reset your POS account password. Use the single-use verification code below to proceed:
               </p>
 
               <!-- OTP Highlight Box -->
@@ -114,7 +114,7 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
               <!-- Security Advisory -->
               <div style="background-color: #FEF3C7; border-left: 4px solid #D97706; border-radius: 6px; padding: 12px 14px; margin-bottom: 24px;">
                 <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #92400E;">
-                  <strong>Security Reminder:</strong> Never share this code with anyone. ApexPOS staff will never ask for your verification code.
+                  <strong>Security Reminder:</strong> Never share this code with anyone. POS staff will never ask for your verification code.
                 </p>
               </div>
 
@@ -124,7 +124,7 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
 
               <p style="margin: 24px 0 0 0; font-size: 13px; line-height: 1.5; color: #4B5563;">
                 Regards,<br />
-                <strong style="color: #1F2937;">The ApexPOS Team</strong>
+                <strong style="color: #1F2937;">The POS Team</strong>
               </p>
             </td>
           </tr>
@@ -133,8 +133,8 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
           <tr>
             <td style="padding: 20px 36px; background-color: #FAF7F2; border-top: 1px solid #E5D8C6; text-align: center;">
               <p style="margin: 0; font-size: 11px; color: #8C7E72; line-height: 1.5;">
-                This automated message was sent by ApexPOS Terminal Security.<br />
-                &copy; ${new Date().getFullYear()} ApexPOS. All rights reserved.
+                This automated message was sent by POS Terminal Security.<br />
+                &copy; ${new Date().getFullYear()} POS. All rights reserved.
               </p>
             </td>
           </tr>
@@ -150,7 +150,7 @@ export const buildOtpEmailHtml = ({ recipientName = 'Team Member', otp, expiryMi
 /**
  * Sends the Password Reset OTP email through configured SMTP
  */
-export const sendPasswordResetOtpEmail = async ({ to, recipientName = 'ApexPOS User', otp }) => {
+export const sendPasswordResetOtpEmail = async ({ to, recipientName = 'POS User', otp }) => {
   const t = getTransporter();
 
   if (!t) {
@@ -164,15 +164,15 @@ export const sendPasswordResetOtpEmail = async ({ to, recipientName = 'ApexPOS U
   }
 
   const fromEmail = env.SMTP_FROM_EMAIL || env.SMTP_USER;
-  const fromName = env.SMTP_FROM_NAME || 'ApexPOS';
+  const fromName = env.SMTP_FROM_NAME || 'POS';
 
   const mailOptions = {
     from: `"${fromName}" <${fromEmail}>`,
     to,
-    subject: 'ApexPOS Password Reset Verification Code',
+    subject: 'POS Password Reset Verification Code',
     text: `Hello ${recipientName},
 
-We received a request to reset your ApexPOS account password.
+We received a request to reset your POS account password.
 
 Your verification code is: ${otp}
 
@@ -181,7 +181,7 @@ This code will expire in 10 minutes.
 If you did not request a password reset, you can safely ignore this email.
 
 Regards,
-ApexPOS Team`,
+POS Team`,
     html: buildOtpEmailHtml({ recipientName, otp, expiryMinutes: 10 }),
   };
 

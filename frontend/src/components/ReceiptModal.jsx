@@ -14,6 +14,38 @@ export default function ReceiptModal({ bill, onClose }) {
   const order = bill.order || {};
   const items = order.items || bill.items || [];
 
+  const completedPayments = (bill.payments || []).filter(
+    (p) => (p.status || 'COMPLETED').toUpperCase() === 'COMPLETED'
+  );
+  const sortedPayments = [...completedPayments].sort(
+    (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+  );
+  const latestPayment = sortedPayments[0] || bill.payments?.[0];
+
+  const totalPaid = completedPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+  const totalBillAmount = Number(bill.totalAmount || bill.grandTotal || 0);
+  const rawStatus = (bill.status || bill.paymentStatus || '').toUpperCase();
+  const isPaid = rawStatus === 'PAID' || (totalBillAmount > 0 && totalPaid >= totalBillAmount);
+  const isPartiallyPaid = !isPaid && (rawStatus === 'PARTIALLY_PAID' || (totalPaid > 0 && totalPaid < totalBillAmount));
+  const statusLabel = isPaid ? 'PAID' : (isPartiallyPaid ? 'PARTIALLY PAID' : 'UNPAID');
+
+  const rawMethod = latestPayment ? (latestPayment.method || latestPayment.paymentMethod) : null;
+  const formatMethod = (m) => {
+    if (!m) return 'Unsettled';
+    switch (String(m).toUpperCase()) {
+      case 'CASH': return 'Cash';
+      case 'UPI': return 'UPI';
+      case 'CARD': return 'Card';
+      case 'RAZORPAY': return 'Razorpay';
+      case 'NET_BANKING': return 'Net Banking';
+      case 'OTHER': return 'Other';
+      default: return m;
+    }
+  };
+  const paymentMethodLabel = (isPaid || isPartiallyPaid) ? formatMethod(rawMethod) : 'Unsettled';
+  const txnRef = latestPayment?.transactionReference || latestPayment?.razorpayPaymentId;
+  const paidAt = (isPaid || isPartiallyPaid) ? (latestPayment?.createdAt || bill.updatedAt) : null;
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white border border-[#E5D8C6] rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh]">
@@ -45,7 +77,7 @@ export default function ReceiptModal({ bill, onClose }) {
           <div id="printable-receipt" className="bg-white text-black p-6 rounded-lg shadow-sm border border-slate-200">
             {/* Store Header */}
             <div className="text-center pb-4 border-b border-dashed border-gray-400">
-              <h2 className="text-lg font-bold uppercase tracking-wider">{restaurant?.name || 'APEX RESTAURANT'}</h2>
+              <h2 className="text-lg font-bold uppercase tracking-wider">{restaurant?.name || 'POS RESTAURANT'}</h2>
               <p className="text-[11px] text-gray-600 mt-1">{restaurant?.address || 'City Center Mall, Food Court'}</p>
               <p className="text-[11px] text-gray-600">Tel: {restaurant?.phone || '+91 98765 43210'}</p>
               {restaurant?.gstNumber && (
@@ -69,8 +101,24 @@ export default function ReceiptModal({ bill, onClose }) {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Status:</span>
-                <span className="font-bold uppercase text-emerald-700">{bill.paymentStatus || 'PAID'}</span>
+                <span className={`font-bold uppercase ${isPaid ? 'text-emerald-700' : 'text-amber-700'}`}>{statusLabel}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Method:</span>
+                <span className="font-bold uppercase">{paymentMethodLabel}</span>
+              </div>
+              {txnRef && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Txn Ref:</span>
+                  <span className="font-mono text-[10px] truncate max-w-[180px]">{txnRef}</span>
+                </div>
+              )}
+              {paidAt && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Paid At:</span>
+                  <span className="font-mono text-[10px]">{new Date(paidAt).toLocaleString()}</span>
+                </div>
+              )}
             </div>
 
             {/* Itemized Table */}

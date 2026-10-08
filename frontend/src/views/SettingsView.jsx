@@ -97,9 +97,9 @@ export default function SettingsView({ initialTab = 'profile', onTabChange }) {
   });
 
   const [platformForm, setPlatformForm] = useState({
-    platformName: 'ApexPOS Enterprise Cloud',
-    supportEmail: 'support@apexpos.com',
-    supportPhone: '+1 (800) 555-APEX',
+    platformName: 'POS Enterprise Cloud',
+    supportEmail: 'support@pos.com',
+    supportPhone: '+1 (800) 555-POS',
     maintenanceMode: false,
     allowNewRegistrations: true,
     defaultPlanDurationDays: 365,
@@ -391,10 +391,10 @@ export default function SettingsView({ initialTab = 'profile', onTabChange }) {
     setSavingSection('preferences');
     try {
       await posService.settings.update('USER', 'user_preferences', userPrefForm);
-      localStorage.setItem('apexpos_preferences', JSON.stringify(userPrefForm));
+      localStorage.setItem('pos_preferences', JSON.stringify(userPrefForm));
       addToast('Your personal station preferences were persisted to the database!', 'success');
     } catch (err) {
-      localStorage.setItem('apexpos_preferences', JSON.stringify(userPrefForm));
+      localStorage.setItem('pos_preferences', JSON.stringify(userPrefForm));
       addToast('Preferences saved locally to this station.', 'info');
     } finally {
       setSavingSection(null);
@@ -477,8 +477,8 @@ export default function SettingsView({ initialTab = 'profile', onTabChange }) {
                 {role === 'RESTAURANT_REGISTRATION_ADMIN'
                   ? 'Platform Governance & SaaS Settings'
                   : role === 'RESTAURANT_OWNER'
-                  ? 'Restaurant Administration & Policy Settings'
-                  : 'Station Preferences & Account Settings'}
+                    ? 'Restaurant Administration & Policy Settings'
+                    : 'Station Preferences & Account Settings'}
               </span>
             </h1>
             <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#16A34A] border border-emerald-200 flex items-center gap-1">
@@ -511,11 +511,10 @@ export default function SettingsView({ initialTab = 'profile', onTabChange }) {
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                isActive
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${isActive
                   ? 'bg-[#92400E] text-white shadow-sm'
                   : 'bg-[#FAF7F2] text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB] border border-[#E5D8C6]'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
@@ -1423,7 +1422,7 @@ export default function SettingsView({ initialTab = 'profile', onTabChange }) {
                   className="w-full bg-[#FAF7F2] border border-[#E5D8C6] rounded-xl px-3.5 py-2.5 text-xs text-[#1F2937] focus:outline-none focus:border-[#92400E] focus:ring-1 focus:ring-[#92400E]"
                 >
                   <option value="sandstone">Sandstone Warm Elegance (Default)</option>
-                  <option value="dark">Apex Dark Mode</option>
+                  <option value="dark">POS Dark Mode</option>
                 </select>
               </div>
 

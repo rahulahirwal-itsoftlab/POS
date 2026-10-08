@@ -6,6 +6,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+      },
       colors: {
         sandstone: {
           bg: '#FAF7F2',
@@ -55,13 +59,16 @@ export default {
         'sm': '6px',
         'md': '10px',
         'lg': '14px',
-        'xl': '18px',
-        '2xl': '22px',
+        'xl': '16px',
+        '2xl': '20px',
+        '3xl': '24px',
       },
       boxShadow: {
-        'sandstone': '0 1px 3px 0 rgba(41, 35, 31, 0.05), 0 1px 2px -1px rgba(41, 35, 31, 0.05)',
-        'sandstone-md': '0 4px 6px -1px rgba(41, 35, 31, 0.07), 0 2px 4px -2px rgba(41, 35, 31, 0.05)',
-        'sandstone-lg': '0 10px 15px -3px rgba(41, 35, 31, 0.08), 0 4px 6px -4px rgba(41, 35, 31, 0.04)',
+        'sandstone-sm': '0 1px 2px 0 rgba(41, 35, 31, 0.04)',
+        'sandstone': '0 2px 6px -1px rgba(41, 35, 31, 0.05), 0 1px 3px -1px rgba(41, 35, 31, 0.04)',
+        'sandstone-md': '0 6px 16px -2px rgba(41, 35, 31, 0.07), 0 2px 6px -2px rgba(41, 35, 31, 0.04)',
+        'sandstone-lg': '0 12px 30px -4px rgba(41, 35, 31, 0.09), 0 4px 10px -2px rgba(41, 35, 31, 0.04)',
+        'sandstone-hover': '0 14px 34px -4px rgba(41, 35, 31, 0.10), 0 4px 12px -2px rgba(41, 35, 31, 0.05)',
       },
     },
   },

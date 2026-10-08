@@ -6,12 +6,12 @@ import { hashPassword } from './utils/password.js';
 const hashOtp = (email, otp) =>
   crypto
     .createHash('sha256')
-    .update(`${email.trim().toLowerCase()}:${otp.trim()}:${env.JWT_SECRET || 'apexpos_secure_salt'}`)
+    .update(`${email.trim().toLowerCase()}:${otp.trim()}:${env.JWT_SECRET || 'pos_secure_salt'}`)
     .digest('hex');
 
 async function runTestSuite() {
   console.log('====================================================');
-  console.log(' STARTING APEXPOS PASSWORD RESET TEST SUITE');
+  console.log(' STARTING POS PASSWORD RESET TEST SUITE');
   console.log('====================================================\n');
 
   const testEmail = `test.reset.${Date.now()}@pos.com`;

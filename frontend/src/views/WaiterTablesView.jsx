@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import posService from '../services/pos.service';
 import { useAuth } from '../context/AuthContext';
+import ReceiptModal from '../components/ReceiptModal';
 import {
   LayoutGrid,
   Users,
@@ -11,16 +12,21 @@ import {
   Receipt,
   Check,
   Search,
-  Filter
+  Filter,
+  Eye,
+  Bell
 } from 'lucide-react';
 
-export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBills }) {
+export default function WaiterTablesView({ onSelectTableForOrder }) {
   const { restaurant, addToast } = useAuth();
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState(null);
+  const [viewingBill, setViewingBill] = useState(null);
+
+  const currency = restaurant?.currency || '₹';
 
   const fetchTables = async () => {
     try {
@@ -37,7 +43,7 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
 
   useEffect(() => {
     fetchTables();
-    const interval = setInterval(fetchTables, 8000);
+    const interval = setInterval(fetchTables, 6000);
     return () => clearInterval(interval);
   }, []);
 
@@ -49,6 +55,32 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
       fetchTables();
     } catch (err) {
       addToast(err.message || 'Failed to mark order as served', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRequestBill = async (orderId, tableNumber) => {
+    setActionLoading(`bill-req-${orderId}`);
+    try {
+      await posService.orders.requestBill(orderId);
+      addToast(`Bill requested from Reception for Table #${tableNumber}!`, 'success');
+      fetchTables();
+    } catch (err) {
+      addToast(err.message || 'Failed to request bill', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleCancelBillRequest = async (orderId, tableNumber) => {
+    setActionLoading(`bill-cancel-${orderId}`);
+    try {
+      await posService.orders.cancelBillRequest(orderId);
+      addToast(`Bill request cancelled for Table #${tableNumber}. You can now add more items.`, 'info');
+      fetchTables();
+    } catch (err) {
+      addToast(err.message || 'Failed to cancel bill request', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -67,6 +99,23 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
     }
   };
 
+  const handleViewBill = async (billId, fallbackBill = null) => {
+    try {
+      const res = await posService.billing.getBillById(billId);
+      if (res.success && res.data) {
+        setViewingBill(res.data);
+      } else if (fallbackBill) {
+        setViewingBill(fallbackBill);
+      }
+    } catch (err) {
+      if (fallbackBill) {
+        setViewingBill(fallbackBill);
+      } else {
+        addToast(err.message || 'Failed to retrieve bill invoice', 'error');
+      }
+    }
+  };
+
   const filteredTables = tables.filter((t) => {
     const matchSearch = String(t.tableNumber).toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchSearch) return false;
@@ -76,6 +125,12 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
     if (filterStatus === 'OCCUPIED') return t.status === 'OCCUPIED';
 
     const order = t.orders?.[0];
+    const hasBill = Boolean(order?.bill);
+    const isBillReady = hasBill && !order.bill.isDelivered && order.bill.status !== 'PAID';
+    const isBillRequested = Boolean(order?.billRequested) && !hasBill;
+
+    if (filterStatus === 'BILL_READY') return isBillReady;
+    if (filterStatus === 'BILL_REQUESTED') return isBillRequested;
     if (filterStatus === 'READY') return order?.status === 'READY';
     if (filterStatus === 'PREPARING') return ['ACCEPTED', 'IN_PREPARATION'].includes(order?.status);
     if (filterStatus === 'SERVED') return order?.status === 'SERVED';
@@ -116,18 +171,18 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
             />
           </div>
 
-          <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-xl border border-[#E5D8C6] text-xs">
-            {['ALL', 'AVAILABLE', 'PREPARING', 'READY', 'SERVED'].map((st) => (
+          <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-[#E5D8C6] text-xs overflow-x-auto">
+            {['ALL', 'AVAILABLE', 'PREPARING', 'READY', 'SERVED', 'BILL_REQUESTED', 'BILL_READY'].map((st) => (
               <button
                 key={st}
                 onClick={() => setFilterStatus(st)}
-                className={`px-3 py-1 rounded-lg font-semibold transition cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer whitespace-nowrap ${
                   filterStatus === st
-                    ? 'bg-[#92400E] text-white shadow-sandstone'
+                    ? 'bg-[#92400E] text-white shadow-sandstone font-bold'
                     : 'text-[#5B6470] hover:text-[#1F2937] hover:bg-[#F1E8DB]'
                 }`}
               >
-                {st}
+                {st === 'BILL_REQUESTED' ? 'BILL REQ' : st === 'BILL_READY' ? 'BILL READY' : st}
               </button>
             ))}
           </div>
@@ -148,22 +203,33 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {filteredTables.map((t) => {
             const activeOrder = t.orders?.[0];
+            const hasBill = Boolean(activeOrder?.bill);
+            const isBillPaid = activeOrder?.bill?.status === 'PAID';
+            const isBillReady = hasBill && !activeOrder.bill.isDelivered && !isBillPaid;
+            const isBillDelivered = hasBill && activeOrder.bill.isDelivered && !isBillPaid;
+            const isBillRequested = Boolean(activeOrder?.billRequested) && !hasBill;
             const isReady = activeOrder?.status === 'READY';
             const isCooking = ['ACCEPTED', 'IN_PREPARATION'].includes(activeOrder?.status);
             const isPending = activeOrder?.status === 'PENDING';
             const isServed = activeOrder?.status === 'SERVED';
             const isAvailable = t.status === 'AVAILABLE';
 
+            const orderTotal = activeOrder?.items?.reduce((sum, it) => sum + Number(it.subtotal || 0), 0) || 0;
+
             return (
               <div
                 key={t.id}
                 className={`flex flex-col justify-between p-5 rounded-2xl border transition shadow-sandstone hover:shadow-sandstone-md hover:-translate-y-0.5 ${
-                  isReady
+                  isBillReady
+                    ? 'bg-blue-50/50 border-blue-300 ring-2 ring-blue-400/40'
+                    : isBillRequested
+                    ? 'bg-amber-50/50 border-amber-300 ring-2 ring-amber-400/40'
+                    : isReady
                     ? 'bg-rose-50/40 border-rose-300'
                     : isCooking
                     ? 'bg-amber-50/40 border-amber-300'
                     : isServed
-                    ? 'bg-blue-50/30 border-blue-200'
+                    ? 'bg-emerald-50/30 border-emerald-200'
                     : isAvailable
                     ? 'bg-white border-[#E5D8C6] hover:border-[#92400E]'
                     : 'bg-white border-[#E5D8C6]'
@@ -183,18 +249,32 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
 
                     <span
                       className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full border ${
-                        isReady
+                        isBillReady
+                          ? 'bg-blue-100 text-blue-900 border-blue-300 font-extrabold animate-pulse'
+                          : isBillRequested
+                          ? 'bg-amber-100 text-amber-900 border-amber-300 font-extrabold animate-pulse'
+                          : isBillDelivered
+                          ? 'bg-slate-100 text-slate-800 border-slate-300'
+                          : isReady
                           ? 'bg-rose-100 text-rose-800 border-rose-200 animate-pulse font-extrabold'
                           : isCooking
                           ? 'bg-amber-100 text-amber-900 border-amber-200'
                           : isPending
                           ? 'bg-slate-100 text-slate-700 border-slate-200'
                           : isServed
-                          ? 'bg-blue-100 text-blue-800 border-blue-200'
+                          ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                           : 'bg-emerald-100 text-emerald-800 border-emerald-200'
                       }`}
                     >
-                      {activeOrder ? activeOrder.status : t.status}
+                      {isBillReady
+                        ? 'BILL READY'
+                        : isBillRequested
+                        ? 'BILL REQUESTED'
+                        : isBillDelivered
+                        ? 'BILL DELIVERED'
+                        : activeOrder
+                        ? activeOrder.status
+                        : t.status}
                     </span>
                   </div>
 
@@ -204,37 +284,66 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                       <div className="flex justify-between items-center">
                         <span className="font-bold text-[#1F2937]">#{activeOrder.orderNumber}</span>
                         <span className="text-[#5B6470] font-medium">
-                          {activeOrder.items?.length || 0} Dish
-                          {(activeOrder.items?.length || 0) > 1 ? 'es' : ''}
+                          {activeOrder.items?.length || 0} Item
+                          {(activeOrder.items?.length || 0) > 1 ? 's' : ''}
                         </span>
                       </div>
 
                       {activeOrder.items && activeOrder.items.length > 0 && (
-                        <div className="text-[11px] text-[#5B6470] space-y-0.5 max-h-20 overflow-y-auto pr-1">
+                        <div className="text-[11px] text-[#5B6470] space-y-1 max-h-24 overflow-y-auto pr-1">
                           {activeOrder.items.map((i, idx) => (
-                            <div key={idx} className="flex justify-between">
+                            <div key={idx} className="flex justify-between items-center">
                               <span className="truncate pr-2 font-medium">
-                                {i.quantity}x {i.menuItem?.name}
+                                <span className="font-bold text-[#1F2937]">{i.quantity}x</span> {i.menuItem?.name || i.name}
                               </span>
-                              <span className="text-[#92400E] font-mono font-bold">
-                                {restaurant?.currency || '₹'}
-                                {Number(i.subtotal || 0).toFixed(2)}
-                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-[9px] uppercase px-1 rounded font-bold border border-slate-200 bg-white text-slate-600">
+                                  {i.status}
+                                </span>
+                                <span className="text-[#92400E] font-mono font-bold">
+                                  {currency}{Number(i.subtotal || 0).toFixed(2)}
+                                </span>
+                              </div>
                             </div>
                           ))}
                         </div>
                       )}
 
-                      {activeOrder.bill && (
-                        <div className="pt-2 border-t border-[#E5D8C6] flex justify-between items-center text-[11px]">
-                          <span className="text-[#5B6470]">Bill Status:</span>
-                          <span
-                            className={`font-bold ${
-                              activeOrder.bill.status === 'PAID' ? 'text-emerald-800' : 'text-[#92400E]'
-                            }`}
-                          >
-                            {activeOrder.bill.status} ({restaurant?.currency || '₹'}
-                            {Number(activeOrder.bill.totalAmount).toFixed(2)})
+                      {/* Authoritative Order Total */}
+                      <div className="pt-2 border-t border-[#E5D8C6] flex justify-between items-center text-xs">
+                        <span className="font-bold text-[#1F2937]">Total:</span>
+                        <span className="text-[#92400E] font-mono text-sm font-extrabold">
+                          {currency}{orderTotal.toFixed(2)}
+                        </span>
+                      </div>
+
+                      {/* Bill Requested Status Callout */}
+                      {isBillRequested && (
+                        <div className="bg-amber-100/70 border border-amber-300 rounded-lg p-2 text-[11px] text-amber-900 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
+                          <span>Bill requested from reception</span>
+                        </div>
+                      )}
+
+                      {/* Bill Ready Status Callout */}
+                      {isBillReady && (
+                        <div className="bg-blue-100/70 border border-blue-300 rounded-lg p-2 text-[11px] text-blue-900 flex items-center justify-between">
+                          <span className="font-semibold flex items-center gap-1">
+                            <Receipt className="w-3.5 h-3.5 text-blue-700" />
+                            Bill ready for customer!
+                          </span>
+                          <span className="font-mono font-bold">
+                            {currency}{Number(activeOrder.bill.totalAmount).toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Bill Paid Callout */}
+                      {isBillPaid && (
+                        <div className="bg-emerald-100/70 border border-emerald-300 rounded-lg p-2 text-[11px] text-emerald-900 flex items-center justify-between">
+                          <span className="font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                            Paid & Settled
                           </span>
                         </div>
                       )}
@@ -246,26 +355,75 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                   )}
                 </div>
 
-                {/* Contextual Action Button */}
+                {/* Contextual Action Buttons */}
                 <div className="pt-3 border-t border-[#E5D8C6]">
                   {isReady ? (
-                    <button
-                      onClick={() => handleServeOrder(activeOrder.id, t.tableNumber)}
-                      disabled={actionLoading === `serve-${activeOrder.id}`}
-                      className="w-full py-2.5 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
-                    >
-                      <Check className="w-4 h-4" />
-                      SERVE FOOD
-                    </button>
-                  ) : activeOrder?.bill && !activeOrder.bill.isDelivered ? (
-                    <button
-                      onClick={() => handleDeliverBill(activeOrder.bill.id, t.tableNumber)}
-                      disabled={actionLoading === `deliver-${activeOrder.bill.id}`}
-                      className="w-full py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
-                    >
-                      <Receipt className="w-4 h-4" />
-                      DELIVER BILL
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleServeOrder(activeOrder.id, t.tableNumber)}
+                        disabled={actionLoading === `serve-${activeOrder.id}`}
+                        className="w-full py-2.5 bg-[#16A34A] hover:bg-[#15803D] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Check className="w-4 h-4" />
+                        SERVE FOOD
+                      </button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => onSelectTableForOrder && onSelectTableForOrder(t)}
+                          className="py-1.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] font-semibold rounded-lg text-[11px] border border-[#E5D8C6] flex items-center justify-center gap-1 transition cursor-pointer"
+                        >
+                          <PlusCircle className="w-3 h-3 text-[#92400E]" />
+                          + Add Items
+                        </button>
+                        <button
+                          onClick={() => handleRequestBill(activeOrder.id, t.tableNumber)}
+                          disabled={actionLoading === `bill-req-${activeOrder.id}`}
+                          className="py-1.5 bg-[#92400E] hover:bg-[#78350F] text-white font-bold rounded-lg text-[11px] flex items-center justify-center gap-1 transition cursor-pointer"
+                        >
+                          <Receipt className="w-3 h-3" />
+                          Request Bill
+                        </button>
+                      </div>
+                    </div>
+                  ) : isBillReady ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleViewBill(activeOrder.bill.id, { ...activeOrder.bill, order: activeOrder })}
+                        className="py-2.5 bg-white hover:bg-[#F1E8DB] text-[#1F2937] border border-[#E5D8C6] font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-[#92400E]" />
+                        VIEW BILL
+                      </button>
+                      <button
+                        onClick={() => handleDeliverBill(activeOrder.bill.id, t.tableNumber)}
+                        disabled={actionLoading === `deliver-${activeOrder.bill.id}`}
+                        className="py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Receipt className="w-3.5 h-3.5" />
+                        SERVE BILL
+                      </button>
+                    </div>
+                  ) : isBillRequested ? (
+                    <div className="space-y-1.5">
+                      <button
+                        disabled
+                        className="w-full py-2.5 bg-amber-100 text-amber-900 border border-amber-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-not-allowed opacity-95"
+                      >
+                        <Clock className="w-3.5 h-3.5 text-[#D97706] animate-spin" />
+                        BILL REQUESTED
+                      </button>
+                      <button
+                        onClick={() => handleCancelBillRequest(activeOrder.id, t.tableNumber)}
+                        disabled={actionLoading === `bill-cancel-${activeOrder.id}`}
+                        className="w-full py-1 text-[11px] text-[#5B6470] hover:text-[#92400E] font-medium transition cursor-pointer text-center underline"
+                      >
+                        Reopen Order (Add More Items)
+                      </button>
+                    </div>
+                  ) : isBillDelivered ? (
+                    <div className="text-center py-2 px-3 text-xs font-semibold text-blue-800 bg-blue-50 border border-blue-200 rounded-xl">
+                      Bill delivered • Receptionist settling payment
+                    </div>
                   ) : isAvailable ? (
                     <button
                       onClick={() => onSelectTableForOrder && onSelectTableForOrder(t)}
@@ -275,19 +433,34 @@ export default function WaiterTablesView({ onSelectTableForOrder, onNavigateToBi
                       NEW ORDER
                     </button>
                   ) : (
-                    <button
-                      onClick={() => onSelectTableForOrder && onSelectTableForOrder(t)}
-                      className="w-full py-2.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] font-semibold rounded-xl text-xs border border-[#E5D8C6] shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
-                    >
-                      <PlusCircle className="w-4 h-4" />
-                      ADD ITEMS TO ORDER
-                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => onSelectTableForOrder && onSelectTableForOrder(t)}
+                        className="py-2.5 bg-[#FAF7F2] hover:bg-[#F1E8DB] text-[#1F2937] font-semibold rounded-xl text-xs border border-[#E5D8C6] shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5 text-[#92400E]" />
+                        ADD ITEMS
+                      </button>
+                      <button
+                        onClick={() => handleRequestBill(activeOrder.id, t.tableNumber)}
+                        disabled={actionLoading === `bill-req-${activeOrder.id}`}
+                        className="py-2.5 bg-[#92400E] hover:bg-[#78350F] text-white font-bold rounded-xl text-xs shadow-sandstone flex items-center justify-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+                      >
+                        <Receipt className="w-3.5 h-3.5" />
+                        REQUEST BILL
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* Bill Inspection Modal for Waiter */}
+      {viewingBill && (
+        <ReceiptModal bill={viewingBill} onClose={() => setViewingBill(null)} />
       )}
     </div>
   );

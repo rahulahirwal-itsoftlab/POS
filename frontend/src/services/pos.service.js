@@ -66,6 +66,8 @@ export const posService = {
     removeItem: (id, itemId) => api.delete(`/orders/${id}/items/${itemId}`),
     markServed: (id) => api.patch(`/orders/${id}/served`),
     sendToKitchen: (id) => api.post(`/orders/${id}/send-to-kitchen`),
+    requestBill: (id) => api.post(`/orders/${id}/request-bill`),
+    cancelBillRequest: (id) => api.post(`/orders/${id}/cancel-bill-request`),
   },
 
   // Waiter Operations
@@ -74,6 +76,8 @@ export const posService = {
     deliverBill: (id) => api.patch(`/billing/bills/${id}/deliver`),
     sendToKitchen: (orderId) => api.post(`/orders/${orderId}/send-to-kitchen`),
     serveOrder: (orderId) => api.patch(`/orders/${orderId}/served`),
+    requestBill: (orderId) => api.post(`/orders/${orderId}/request-bill`),
+    cancelBillRequest: (orderId) => api.post(`/orders/${orderId}/cancel-bill-request`),
   },
 
   // Kitchen Operations
@@ -122,6 +126,9 @@ export const posService = {
     },
     getById: (id) => api.get(`/payments/${id}`),
     processPayment: (data) => api.post('/payments', data),
+    createRazorpayOrder: (data) => api.post('/payments/razorpay/order', data),
+    createRazorpayQrCode: (data) => api.post('/payments/razorpay/qr', data),
+    verifyRazorpayPayment: (data) => api.post('/payments/razorpay/verify', data),
   },
 
   // Inventory
